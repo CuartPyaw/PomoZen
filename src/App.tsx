@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 type TimerMode = 'focus' | 'break' | 'longBreak';
@@ -8,6 +8,7 @@ const BREAK_TIME = 5 * 60;
 const LONG_BREAK_TIME = 30 * 60;
 
 const POMODORO_CYCLE_COUNT = 5;
+const MODE_SWITCH_DELAY = 2000;
 
 function App() {
   const [mode, setMode] = useState<TimerMode>('focus');
@@ -17,14 +18,29 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [autoSwitch, setAutoSwitch] = useState(true);
   const [autoStart, setAutoStart] = useState(true);
+  const [enableNotifications, setEnableNotifications] = useState(false);
   const [pomodoroCycle, setPomodoroCycle] = useState(1);
+  const [completionGuard, setCompletionGuard] = useState(false);
+
+  const switchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!isRunning) return;
+    return () => {
+      if (switchTimeoutRef.current) {
+        clearTimeout(switchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isRunning) {
+      setCompletionGuard(false);
+      return;
+    }
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        if (prev === 1) {
           handleTimerComplete();
           return 0;
         }
@@ -35,29 +51,85 @@ function App() {
     return () => clearInterval(interval);
   }, [isRunning, mode, autoSwitch, autoStart, pomodoroCycle]);
 
+  const requestNotificationPermission = () => {
+    if ('Notification' in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          setEnableNotifications(true);
+        }
+      });
+    }
+  };
+
+  const sendNotification = (title: string, body: string) => {
+    if (enableNotifications && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        body,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+      });
+    }
+  };
+
   const handleTimerComplete = () => {
+    if (completionGuard) {
+      return;
+    }
+    setCompletionGuard(true);
+
     setIsRunning(false);
+
+    let nextMode: TimerMode | null = null;
+
+    if (mode === 'focus') {
+      nextMode = 'break';
+    } else if (mode === 'break') {
+      if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
+        nextMode = 'longBreak';
+      } else {
+        nextMode = 'focus';
+      }
+    } else if (mode === 'longBreak') {
+      nextMode = 'focus';
+    }
+
+    if (nextMode) {
+      if (mode === 'focus') {
+        sendNotification('专注结束', '时间到了！该休息一下了');
+      } else if (mode === 'break') {
+        sendNotification('休息结束', '休息完成！开始专注吧');
+      } else if (mode === 'longBreak') {
+        sendNotification('长休息结束', '休息完成！开始新的番茄钟周期');
+      }
+    }
 
     if (!autoSwitch) {
       return;
     }
 
-    if (mode === 'focus') {
-      switchToMode('break', autoStart);
-    } else if (mode === 'break') {
-      if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
-        switchToMode('longBreak', autoStart);
-      } else {
-        setPomodoroCycle(pomodoroCycle + 1);
+    if (switchTimeoutRef.current) {
+      clearTimeout(switchTimeoutRef.current);
+    }
+
+    switchTimeoutRef.current = setTimeout(() => {
+      if (mode === 'focus') {
+        switchToMode('break', autoStart);
+      } else if (mode === 'break') {
+        if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
+          switchToMode('longBreak', autoStart);
+        } else {
+          setPomodoroCycle(pomodoroCycle + 1);
+          switchToMode('focus', autoStart);
+        }
+      } else if (mode === 'longBreak') {
+        setPomodoroCycle(1);
         switchToMode('focus', autoStart);
       }
-    } else if (mode === 'longBreak') {
-      setPomodoroCycle(1);
-      switchToMode('focus', autoStart);
-    }
+    }, MODE_SWITCH_DELAY);
   };
 
   const switchToMode = (newMode: TimerMode, shouldAutoStart: boolean = false) => {
+    setCompletionGuard(false);
     setMode(newMode);
     const time =
       newMode === 'focus'
@@ -77,11 +149,15 @@ function App() {
   };
 
   const handleStartPause = () => {
+    if (!isRunning) {
+      setCompletionGuard(false);
+    }
     setIsRunning(!isRunning);
   };
 
   const handleReset = () => {
     setIsRunning(false);
+    setCompletionGuard(false);
     setTimeLeft(
       mode === 'focus'
         ? FOCUS_TIME
@@ -94,7 +170,15 @@ function App() {
 
   const handleManualModeToggle = (newMode: TimerMode) => {
     setPomodoroCycle(1);
+    setCompletionGuard(false);
     switchToMode(newMode, false);
+  };
+
+  const handleNotificationToggle = (enabled: boolean) => {
+    setEnableNotifications(enabled);
+    if (enabled && 'Notification' in window && Notification.permission === 'default') {
+      requestNotificationPermission();
+    }
   };
 
   const getCycleInfo = () => {
@@ -196,6 +280,32 @@ function App() {
             />
             自动切换模式时自动开始计时
           </label>
+
+          <label className="settings-label">
+            <input
+              type="checkbox"
+              checked={enableNotifications}
+              onChange={(e) => handleNotificationToggle(e.target.checked)}
+              className="checkbox"
+            />
+            启用桌面通知
+          </label>
+
+          {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
+            <div className="notification-permission">
+              <button className="permission-button" onClick={requestNotificationPermission}>
+                授权通知权限
+              </button>
+            </div>
+          )}
+
+          {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
+            <div className="notification-status">✓ 通知已启用</div>
+          )}
+
+          {enableNotifications && !('Notification' in window) && (
+            <div className="notification-status">⚠️ 当前浏览器不支持通知</div>
+          )}
 
           {autoSwitch && (
             <div className="settings-info">

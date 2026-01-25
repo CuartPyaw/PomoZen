@@ -202,21 +202,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        const current = localStorage.getItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS);
-        if (current !== 'true') {
-          console.log('Browser permission granted, enabling notifications');
-          setEnableNotifications(true);
-          localStorage.setItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS, 'true');
-        }
-      } catch (error) {
-        console.error('Failed to sync notification permission:', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     try {
       console.log('Saving autoSwitch:', autoSwitch);
       localStorage.setItem(STORAGE_KEYS.AUTO_SWITCH, String(autoSwitch));

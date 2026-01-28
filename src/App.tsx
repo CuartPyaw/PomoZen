@@ -11,6 +11,8 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { Container, Box, Typography, Button, Card, CardContent, TextField, Switch, Stack, Fab } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import './App.css';
 
 // 类型定义
@@ -762,171 +764,219 @@ function App() {
 // JSX 渲染
 
   return (
-    <div className="app">
-      <div className="container">
-        <div className="header">
-          <h1 className="title">番茄钟</h1>
-        </div>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+        <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+          番茄钟
+        </Typography>
 
-        <div className="mode-toggle">
-          <button
-            className={`mode-button ${mode === 'focus' ? 'active' : ''}`}
-            onClick={() => {
-              if (mode !== 'focus') handleManualModeToggle('focus');
-            }}
+        <Stack direction="row" spacing={2} sx={{ mb: 4, width: '100%', justifyContent: 'center' }}>
+          <Button
+            variant={mode === 'focus' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
+            sx={{ minWidth: 80, borderRadius: 4 }}
           >
             专注
-          </button>
-          <button
-            className={`mode-button ${mode === 'break' ? 'active' : ''}`}
-            onClick={() => {
-              if (mode !== 'break') handleManualModeToggle('break');
-            }}
+          </Button>
+          <Button
+            variant={mode === 'break' ? 'contained' : 'outlined'}
+            color="secondary"
+            onClick={() => mode !== 'break' && handleManualModeToggle('break')}
+            sx={{ minWidth: 80, borderRadius: 4 }}
           >
             短休息
-          </button>
-          <button
-            className={`mode-button ${mode === 'longBreak' ? 'active' : ''}`}
-            onClick={() => {
-              if (mode !== 'longBreak') handleManualModeToggle('longBreak');
-            }}
+          </Button>
+          <Button
+            variant={mode === 'longBreak' ? 'contained' : 'outlined'}
+            color="secondary"
+            onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
+            sx={{ minWidth: 80, borderRadius: 4 }}
           >
             长休息
-          </button>
-        </div>
+          </Button>
+        </Stack>
 
-        <div className="timer-display">
-          <div className="time">{formatTime(timeLeft)}</div>
-          <div className="mode-label">{getModeLabel()}</div>
-          {autoSwitch && <div className="cycle-info">{getCycleInfo()}</div>}
-        </div>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography variant="h2" component="div" sx={{ fontSize: { xs: '4rem', md: '6rem' }, fontWeight: 'bold', mb: 2 }}>
+            {formatTime(timeLeft)}
+          </Typography>
+          <Typography variant="h5" color="text.secondary" gutterBottom>
+            {getModeLabel()}
+          </Typography>
+          {autoSwitch && (
+            <Typography variant="body2" color="text.secondary">
+              {getCycleInfo()}
+            </Typography>
+          )}
+        </Box>
 
-        <div className="controls">
-          <button className="control-button primary" onClick={handleStartPause}>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleStartPause}
+            color="primary"
+            sx={{ minWidth: 120, py: 2, borderRadius: 4 }}
+          >
             {isRunning ? '暂停' : '开始'}
-          </button>
-          <button className="control-button secondary" onClick={handleReset}>
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={handleReset}
+            color="secondary"
+            sx={{ minWidth: 120, py: 2, borderRadius: 4 }}
+          >
             重置
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Stack>
+      </Container>
 
-      <button
-        className={`settings-button ${showSettings ? 'active' : ''}`}
+      <Fab
+        color="primary"
         onClick={() => setShowSettings(!showSettings)}
+        sx={{ position: 'fixed', bottom: 24, right: 24 }}
         aria-label="设置"
       >
-        ⚙️
-      </button>
+        <SettingsIcon />
+      </Fab>
 
       {showSettings && (
-        <div className="settings-panel">
-          <h3 className="settings-title">时间设置</h3>
+        <Box
+          sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, bgcolor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setShowSettings(false)}
+        >
+          <Card
+            sx={{ width: { xs: '90%', sm: 400 }, maxHeight: '80vh', overflowY: 'auto', m: 2, borderRadius: 4 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                时间设置
+              </Typography>
 
-          <div className="settings-item">
-            <label className="input-label">
-              专注时长 (分钟):
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={customFocusTime / 60}
-                onChange={(e) => handleTimeChange('focus', parseInt(e.target.value) || 25)}
-                className="number-input"
-              />
-            </label>
-          </div>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" gutterBottom>
+                  专注时长 (分钟)
+                </Typography>
+                <TextField
+                  type="number"
+                  fullWidth
+                  inputProps={{ min: 1, max: 120 }}
+                  value={customFocusTime / 60}
+                  onChange={(e) => handleTimeChange('focus', parseInt(e.target.value) || 25)}
+                  variant="outlined"
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+                />
+              </Box>
 
-          <div className="settings-item">
-            <label className="input-label">
-              短休息时长 (分钟):
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={customBreakTime / 60}
-                onChange={(e) => handleTimeChange('break', parseInt(e.target.value) || 5)}
-                className="number-input"
-              />
-            </label>
-          </div>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" gutterBottom>
+                  短休息时长 (分钟)
+                </Typography>
+                <TextField
+                  type="number"
+                  fullWidth
+                  inputProps={{ min: 1, max: 120 }}
+                  value={customBreakTime / 60}
+                  onChange={(e) => handleTimeChange('break', parseInt(e.target.value) || 5)}
+                  variant="outlined"
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+                />
+              </Box>
 
-          <div className="settings-item">
-            <label className="input-label">
-              长休息时长 (分钟):
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={customLongBreakTime / 60}
-                onChange={(e) => handleTimeChange('longBreak', parseInt(e.target.value) || 30)}
-                className="number-input"
-              />
-            </label>
-          </div>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" gutterBottom>
+                  长休息时长 (分钟)
+                </Typography>
+                <TextField
+                  type="number"
+                  fullWidth
+                  inputProps={{ min: 1, max: 120 }}
+                  value={customLongBreakTime / 60}
+                  onChange={(e) => handleTimeChange('longBreak', parseInt(e.target.value) || 30)}
+                  variant="outlined"
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+                />
+              </Box>
 
-          <hr className="settings-divider" />
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                自动切换设置
+              </Typography>
 
-          <h3 className="settings-title">自动切换设置</h3>
+              <Box sx={{ mb: 2 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography variant="body2">启用自动切换模式</Typography>
+                  <Switch
+                    checked={autoSwitch}
+                    onChange={(e) => setAutoSwitch(e.target.checked)}
+                  />
+                </Stack>
+              </Box>
 
-          <label className="settings-label">
-            <input
-              type="checkbox"
-              checked={autoSwitch}
-              onChange={(e) => setAutoSwitch(e.target.checked)}
-              className="checkbox"
-            />
-            启用自动切换模式
-          </label>
+              <Box sx={{ mb: 2 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography variant="body2">自动切换模式时自动开始计时</Typography>
+                  <Switch
+                    checked={autoStart}
+                    onChange={(e) => setAutoStart(e.target.checked)}
+                  />
+                </Stack>
+              </Box>
 
-          <label className="settings-label">
-            <input
-              type="checkbox"
-              checked={autoStart}
-              onChange={(e) => setAutoStart(e.target.checked)}
-              className="checkbox"
-            />
-            自动切换模式时自动开始计时
-          </label>
+              <Box sx={{ mb: 2 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography variant="body2">启用桌面通知</Typography>
+                  <Switch
+                    checked={enableNotifications}
+                    onChange={(e) => handleNotificationToggle(e.target.checked)}
+                  />
+                </Stack>
+              </Box>
 
-          <label className="settings-label">
-            <input
-              type="checkbox"
-              checked={enableNotifications}
-              onChange={(e) => handleNotificationToggle(e.target.checked)}
-              className="checkbox"
-            />
-            启用桌面通知
-          </label>
+              {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={requestNotificationPermission}
+                  >
+                    授权通知权限
+                  </Button>
+                </Box>
+              )}
 
-          {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
-            <div className="notification-permission">
-              <button className="permission-button" onClick={requestNotificationPermission}>
-                授权通知权限
-              </button>
-            </div>
-          )}
+              {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
+                <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
+                  ✓ 通知已启用
+                </Typography>
+              )}
 
-          {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
-            <div className="notification-status">✓ 通知已启用</div>
-          )}
+              {enableNotifications && !('Notification' in window) && (
+                <Typography variant="body2" color="warning.main" sx={{ mt: 2 }}>
+                  ⚠️ 当前浏览器不支持通知
+                </Typography>
+              )}
 
-          {enableNotifications && !('Notification' in window) && (
-            <div className="notification-status">⚠️ 当前浏览器不支持通知</div>
-          )}
-
-          {autoSwitch && (
-            <div className="settings-info">
-              <strong>循环模式:</strong>
-              <br />
-              专注 → 短休息 (重复 {POMODORO_CYCLE_COUNT} 次) → 长休息
-              <br />
-              <small>注意: 只有自动切换时才会自动开始，手动切换需要点击"开始"</small>
-            </div>
-          )}
-        </div>
+              {autoSwitch && (
+                <Box sx={{ mt: 2, p: 2, bgcolor: 'action.hover', borderRadius: 4 }}>
+                  <Typography variant="body2" fontWeight="bold" gutterBottom>
+                    循环模式:
+                  </Typography>
+                  <Typography variant="body2">
+                    专注 → 短休息 (重复 {POMODORO_CYCLE_COUNT} 次) → 长休息
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                    注意: 只有自动切换时才会自动开始，手动切换需要点击"开始"
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }
 

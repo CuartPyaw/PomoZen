@@ -11,8 +11,36 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Container, Box, Typography, Button, Card, CardContent, TextField, Switch, Stack, Fab } from '@mui/material';
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  TextField,
+  Switch,
+  Stack,
+  Fab,
+  Chip,
+  AppBar,
+  Toolbar,
+  Divider,
+  ButtonGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Tooltip,
+  Zoom
+} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import CloseIcon from '@mui/icons-material/Close';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
 import './App.css';
 
 // 类型定义
@@ -478,6 +506,61 @@ function App() {
     return () => clearInterval(interval);
   }, [isRunning, mode, autoSwitch, autoStart, pomodoroCycle, customFocusTime, customBreakTime, customLongBreakTime]);
 
+// 键盘快捷键
+
+  /**
+   * 键盘快捷键监听
+   * - Space/Enter: 开始/暂停
+   * - R: 重置
+   * - 1: 专注模式
+   * - 2: 短休息模式
+   * - 3: 长休息模式
+   * - Esc: 关闭设置窗口
+   */
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // 如果设置窗口打开且按了 Esc，关闭设置窗口
+      if (showSettings && e.key === 'Escape') {
+        setShowSettings(false);
+        return;
+      }
+
+      // 如果设置窗口打开，阻止其他快捷键
+      if (showSettings) {
+        return;
+      }
+
+      // 如果在输入框中，不触发快捷键
+      if ((e.target as HTMLElement).tagName === 'INPUT') {
+        return;
+      }
+
+      switch (e.key) {
+        case ' ':
+        case 'Enter':
+          e.preventDefault();
+          handleStartPause();
+          break;
+        case 'r':
+        case 'R':
+          handleReset();
+          break;
+        case '1':
+          handleManualModeToggle('focus');
+          break;
+        case '2':
+          handleManualModeToggle('break');
+          break;
+        case '3':
+          handleManualModeToggle('longBreak');
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showSettings, isRunning]);
+
 // 通知功能
 
   /**
@@ -649,6 +732,30 @@ function App() {
   };
 
   /**
+   * 获取当前模式对应的总时长
+   * @returns 总时长（秒）
+   */
+  const getTotalTime = (): number => {
+    return mode === 'focus'
+      ? getFocusTime()
+      : mode === 'break'
+      ? getBreakTime()
+      : getLongBreakTime();
+  };
+
+  /**
+   * 计算 SVG 环形进度条的参数
+   * @returns 环形进度条的圆周和偏移量
+   */
+  const getProgressParams = () => {
+    const radius = 120;
+    const circumference = 2 * Math.PI * radius;
+    const progress = timeLeft / getTotalTime();
+    const offset = circumference * (1 - progress);
+    return { radius, circumference, offset };
+  };
+
+  /**
    * 获取当前模式的中文标签
    * @returns 模式标签（如 "专注时间"、"短休息"、"长休息"）
    */
@@ -763,218 +870,369 @@ function App() {
 
 // JSX 渲染
 
+  const { radius, circumference, offset } = getProgressParams();
+
+  // 定义模式颜色
+  const modeColors = {
+    focus: { primary: '#667eea', primaryDark: '#5568d3', bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+    break: { primary: '#11998e', primaryDark: '#0f8a82', bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+    longBreak: { primary: '#4facfe', primaryDark: '#3d9bde', bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+  };
+
+  const themeColor = modeColors[mode];
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-      <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
-        <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          番茄钟
-        </Typography>
-
-        <Stack direction="row" spacing={2} sx={{ mb: 4, width: '100%', justifyContent: 'center' }}>
-          <Button
-            variant={mode === 'focus' ? 'contained' : 'outlined'}
-            color="primary"
-            onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
-            sx={{ minWidth: 80, borderRadius: 4 }}
-          >
-            专注
-          </Button>
-          <Button
-            variant={mode === 'break' ? 'contained' : 'outlined'}
-            color="secondary"
-            onClick={() => mode !== 'break' && handleManualModeToggle('break')}
-            sx={{ minWidth: 80, borderRadius: 4 }}
-          >
-            短休息
-          </Button>
-          <Button
-            variant={mode === 'longBreak' ? 'contained' : 'outlined'}
-            color="secondary"
-            onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
-            sx={{ minWidth: 80, borderRadius: 4 }}
-          >
-            长休息
-          </Button>
-        </Stack>
-
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h2" component="div" sx={{ fontSize: { xs: '4rem', md: '6rem' }, fontWeight: 'bold', mb: 2 }}>
-            {formatTime(timeLeft)}
+    <Box sx={{ minHeight: '100vh', background: themeColor.bg, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      {/* 顶部 AppBar */}
+      <AppBar position="static" elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
+        <Toolbar sx={{ justifyContent: 'center' }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+            番茄钟
           </Typography>
-          <Typography variant="h5" color="text.secondary" gutterBottom>
-            {getModeLabel()}
-          </Typography>
-          {autoSwitch && (
-            <Typography variant="body2" color="text.secondary">
-              {getCycleInfo()}
-            </Typography>
-          )}
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', py: 2 }}>
+        {/* 模式切换按钮组 */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+          <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 4, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(255,255,255,0.3)' } }}>
+            <Tooltip title="快捷键: 1" arrow TransitionComponent={Zoom}>
+              <Button
+                onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
+                sx={{
+                  minWidth: 90,
+                  borderRadius: 4,
+                  bgcolor: mode === 'focus' ? 'rgba(255,255,255,0.95)' : 'transparent',
+                  color: mode === 'focus' ? themeColor.primary : 'white',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                }}
+              >
+                专注
+              </Button>
+            </Tooltip>
+            <Tooltip title="快捷键: 2" arrow TransitionComponent={Zoom}>
+              <Button
+                onClick={() => mode !== 'break' && handleManualModeToggle('break')}
+                sx={{
+                  minWidth: 90,
+                  borderRadius: 4,
+                  bgcolor: mode === 'break' ? 'rgba(255,255,255,0.95)' : 'transparent',
+                  color: mode === 'break' ? modeColors.break.primary : 'white',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                }}
+              >
+                短休息
+              </Button>
+            </Tooltip>
+            <Tooltip title="快捷键: 3" arrow TransitionComponent={Zoom}>
+              <Button
+                onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
+                sx={{
+                  minWidth: 90,
+                  borderRadius: 4,
+                  bgcolor: mode === 'longBreak' ? 'rgba(255,255,255,0.95)' : 'transparent',
+                  color: mode === 'longBreak' ? modeColors.longBreak.primary : 'white',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                }}
+              >
+                长休息
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </Box>
 
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={handleStartPause}
-            color="primary"
-            sx={{ minWidth: 120, py: 2, borderRadius: 4 }}
-          >
-            {isRunning ? '暂停' : '开始'}
-          </Button>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={handleReset}
-            color="secondary"
-            sx={{ minWidth: 120, py: 2, borderRadius: 4 }}
-          >
-            重置
-          </Button>
-        </Stack>
+        {/* 计时器卡片 */}
+        <Card
+          elevation={8}
+          sx={{
+            borderRadius: 6,
+            mb: 3,
+            bgcolor: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(10px)',
+            overflow: 'visible',
+          }}
+        >
+          <CardContent sx={{ pb: 3, pt: 4, px: 2 }}>
+            {/* SVG 环形进度条 */}
+            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, minHeight: 280 }}>
+              <svg width={260} height={260} style={{ transform: 'rotate(-90deg)' }}>
+                <circle
+                  cx={130}
+                  cy={130}
+                  r={radius}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.06)"
+                  strokeWidth={12}
+                />
+                <circle
+                  cx={130}
+                  cy={130}
+                  r={radius}
+                  fill="none"
+                  stroke={themeColor.primary}
+                  strokeWidth={12}
+                  strokeDasharray={circumference}
+                  strokeDashoffset={offset}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                />
+              </svg>
+              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                <Typography variant="h2" component="div" sx={{ fontSize: { xs: '3rem', md: '4rem' }, fontWeight: 'bold', color: 'text.primary' }}>
+                  {formatTime(timeLeft)}
+                </Typography>
+                <Typography variant="h6" color="text.secondary" sx={{ mt: 1, fontWeight: 500 }}>
+                  {getModeLabel()}
+                </Typography>
+                {autoSwitch && (
+                  <Chip
+                    label={getCycleInfo()}
+                    size="small"
+                    sx={{ mt: 1, bgcolor: themeColor.primary, color: 'white' }}
+                  />
+                )}
+              </Box>
+            </Box>
+          </CardContent>
+
+          <Divider sx={{ mx: 3 }} />
+
+          <CardActions sx={{ justifyContent: 'center', p: 3, gap: 2 }}>
+            <Tooltip title={isRunning ? '暂停 (空格)' : '开始 (空格)'} arrow TransitionComponent={Zoom}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleStartPause}
+                startIcon={isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 4,
+                  bgcolor: themeColor.primary,
+                  '&:hover': { bgcolor: themeColor.primaryDark },
+                }}
+              >
+                {isRunning ? '暂停' : '开始'}
+              </Button>
+            </Tooltip>
+            <Tooltip title="重置 (R)" arrow TransitionComponent={Zoom}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleReset}
+                startIcon={<RefreshIcon />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 4,
+                  borderColor: themeColor.primary,
+                  color: themeColor.primary,
+                  '&:hover': { borderColor: themeColor.primaryDark, bgcolor: `${themeColor.primary}10` },
+                }}
+              >
+                重置
+              </Button>
+            </Tooltip>
+          </CardActions>
+        </Card>
+
+        {/* 键盘快捷键提示 */}
+        <Card elevation={2} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(5px)' }}>
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              <KeyboardIcon sx={{ color: 'white', fontSize: 18 }} />
+              <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                快捷键
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+              <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+            </Box>
+          </CardContent>
+        </Card>
       </Container>
 
+      {/* 设置按钮 */}
       <Fab
-        color="primary"
         onClick={() => setShowSettings(!showSettings)}
-        sx={{ position: 'fixed', bottom: 24, right: 24 }}
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          bgcolor: 'rgba(255,255,255,0.95)',
+          color: themeColor.primary,
+          '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+        }}
         aria-label="设置"
       >
         <SettingsIcon />
       </Fab>
 
       {showSettings && (
-        <Box
-          sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, bgcolor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          onClick={() => setShowSettings(false)}
+        <Dialog
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: { borderRadius: 4 }
+          }}
         >
-          <Card
-            sx={{ width: { xs: '90%', sm: 400 }, maxHeight: '80vh', overflowY: 'auto', m: 2, borderRadius: 4 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                时间设置
-              </Typography>
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+            <Typography variant="h6" component="div">
+              设置
+            </Typography>
+            <IconButton
+              onClick={() => setShowSettings(false)}
+              size="small"
+              sx={{ color: 'text.secondary' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <Divider />
+          <DialogContent sx={{ pt: 2 }}>
+            {/* 时间设置部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              ⏱ 时间设置
+            </Typography>
 
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" gutterBottom>
-                  专注时长 (分钟)
-                </Typography>
-                <TextField
-                  type="number"
-                  fullWidth
-                  inputProps={{ min: 1, max: 120 }}
-                  value={customFocusTime / 60}
-                  onChange={(e) => handleTimeChange('focus', parseInt(e.target.value) || 25)}
-                  variant="outlined"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              <TextField
+                label="专注时长"
+                type="number"
+                fullWidth
+                size="small"
+                InputProps={{
+                  endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography>
+                }}
+                inputProps={{ min: 1, max: 120 }}
+                value={customFocusTime / 60}
+                onChange={(e) => handleTimeChange('focus', parseInt(e.target.value) || 25)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+              />
+              <TextField
+                label="短休息时长"
+                type="number"
+                fullWidth
+                size="small"
+                InputProps={{
+                  endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography>
+                }}
+                inputProps={{ min: 1, max: 120 }}
+                value={customBreakTime / 60}
+                onChange={(e) => handleTimeChange('break', parseInt(e.target.value) || 5)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+              />
+              <TextField
+                label="长休息时长"
+                type="number"
+                fullWidth
+                size="small"
+                InputProps={{
+                  endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography>
+                }}
+                inputProps={{ min: 1, max: 120 }}
+                value={customLongBreakTime / 60}
+                onChange={(e) => handleTimeChange('longBreak', parseInt(e.target.value) || 30)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+              />
+            </Stack>
+
+            {/* 自动切换设置部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              🔄 自动切换设置
+            </Typography>
+
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="body2">启用自动切换模式</Typography>
+                <Switch
+                  checked={autoSwitch}
+                  onChange={(e) => setAutoSwitch(e.target.checked)}
+                  size="small"
                 />
               </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" gutterBottom>
-                  短休息时长 (分钟)
-                </Typography>
-                <TextField
-                  type="number"
-                  fullWidth
-                  inputProps={{ min: 1, max: 120 }}
-                  value={customBreakTime / 60}
-                  onChange={(e) => handleTimeChange('break', parseInt(e.target.value) || 5)}
-                  variant="outlined"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="body2">自动切换时自动开始计时</Typography>
+                <Switch
+                  checked={autoStart}
+                  onChange={(e) => setAutoStart(e.target.checked)}
+                  size="small"
                 />
               </Box>
+            </Stack>
 
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" gutterBottom>
-                  长休息时长 (分钟)
-                </Typography>
-                <TextField
-                  type="number"
-                  fullWidth
-                  inputProps={{ min: 1, max: 120 }}
-                  value={customLongBreakTime / 60}
-                  onChange={(e) => handleTimeChange('longBreak', parseInt(e.target.value) || 30)}
-                  variant="outlined"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
-                />
-              </Box>
+            {/* 通知设置部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              🔔 通知设置
+            </Typography>
 
-              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                自动切换设置
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="body2">启用桌面通知</Typography>
+              <Switch
+                checked={enableNotifications}
+                onChange={(e) => handleNotificationToggle(e.target.checked)}
+                size="small"
+              />
+            </Box>
 
-              <Box sx={{ mb: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                  <Typography variant="body2">启用自动切换模式</Typography>
-                  <Switch
-                    checked={autoSwitch}
-                    onChange={(e) => setAutoSwitch(e.target.checked)}
-                  />
-                </Stack>
-              </Box>
+            {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={requestNotificationPermission}
+                startIcon={<SettingsIcon />}
+                sx={{ mb: 2, borderRadius: 3 }}
+              >
+                授权通知权限
+              </Button>
+            )}
 
-              <Box sx={{ mb: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                  <Typography variant="body2">自动切换模式时自动开始计时</Typography>
-                  <Switch
-                    checked={autoStart}
-                    onChange={(e) => setAutoStart(e.target.checked)}
-                  />
-                </Stack>
-              </Box>
+            {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
+              <Chip
+                label="✓ 通知已启用"
+                color="success"
+                size="small"
+                sx={{ mb: 2 }}
+              />
+            )}
 
-              <Box sx={{ mb: 2 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                  <Typography variant="body2">启用桌面通知</Typography>
-                  <Switch
-                    checked={enableNotifications}
-                    onChange={(e) => handleNotificationToggle(e.target.checked)}
-                  />
-                </Stack>
-              </Box>
+            {enableNotifications && !('Notification' in window) && (
+              <Chip
+                label="⚠️ 当前浏览器不支持通知"
+                color="warning"
+                size="small"
+                sx={{ mb: 2 }}
+              />
+            )}
 
-              {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={requestNotificationPermission}
-                  >
-                    授权通知权限
-                  </Button>
-                </Box>
-              )}
-
-              {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
-                <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
-                  ✓ 通知已启用
-                </Typography>
-              )}
-
-              {enableNotifications && !('Notification' in window) && (
-                <Typography variant="body2" color="warning.main" sx={{ mt: 2 }}>
-                  ⚠️ 当前浏览器不支持通知
-                </Typography>
-              )}
-
-              {autoSwitch && (
-                <Box sx={{ mt: 2, p: 2, bgcolor: 'action.hover', borderRadius: 4 }}>
-                  <Typography variant="body2" fontWeight="bold" gutterBottom>
-                    循环模式:
+            {/* 循环模式说明 */}
+            {autoSwitch && (
+              <Card variant="outlined" sx={{ mt: 2, borderRadius: 3, bgcolor: 'action.hover' }}>
+                <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                  <Typography variant="body2" fontWeight={600} gutterBottom>
+                    循环模式说明
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" color="text.secondary">
                     专注 → 短休息 (重复 {POMODORO_CYCLE_COUNT} 次) → 长休息
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                    注意: 只有自动切换时才会自动开始，手动切换需要点击"开始"
+                    💡 自动切换时才会自动开始，手动切换需点击"开始"
                   </Typography>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-        </Box>
+                </CardContent>
+              </Card>
+            )}
+          </DialogContent>
+        </Dialog>
       )}
     </Box>
   );

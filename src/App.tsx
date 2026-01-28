@@ -981,7 +981,7 @@ function App() {
                 />
               </svg>
               <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h2" component="div" sx={{ fontSize: { xs: '3rem', md: '4rem' }, fontWeight: 'bold', color: 'text.primary' }}>
+                <Typography variant="h2" component="div" sx={{ fontSize: { xs: '2.5rem', md: '3rem' }, fontWeight: 'bold', color: 'text.primary' }}>
                   {formatTime(timeLeft)}
                 </Typography>
                 <Typography variant="h6" color="text.secondary" sx={{ mt: 1, fontWeight: 500 }}>

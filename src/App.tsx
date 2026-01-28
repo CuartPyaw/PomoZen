@@ -748,7 +748,7 @@ function App() {
    * @returns 环形进度条的圆周和偏移量
    */
   const getProgressParams = () => {
-    const radius = 120;
+    const radius = 123;
     const circumference = 2 * Math.PI * radius;
     const progress = timeLeft / getTotalTime();
     const offset = circumference * (1 - progress);
@@ -958,7 +958,7 @@ function App() {
           <CardContent sx={{ pb: 3, pt: 4, px: 2 }}>
             {/* SVG 环形进度条 */}
             <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, minHeight: 280 }}>
-              <svg width={260} height={260} style={{ transform: 'rotate(-90deg)' }}>
+              <svg width={270} height={260} style={{ transform: 'rotate(-90deg)' }}>
                 <circle
                   cx={130}
                   cy={130}

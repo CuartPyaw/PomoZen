@@ -910,7 +910,7 @@ function App() {
               letterSpacing: '-0.02em',
             }}
           >
-            番茄钟
+            Tomato Clock
           </Typography>
         </Toolbar>
       </AppBar>

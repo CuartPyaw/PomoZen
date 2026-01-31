@@ -232,6 +232,17 @@ export const createDarkTheme = () => createTheme({
               borderColor: designTokens.colors.accent.primary,
               boxShadow: `0 0 0 2px ${designTokens.colors.accent.glow}`,
             },
+            '& input[type=number]::-webkit-inner-spin-button': {
+              '-webkit-appearance': 'none',
+              margin: 0,
+            },
+            '& input[type=number]::-webkit-outer-spin-button': {
+              '-webkit-appearance': 'none',
+              margin: 0,
+            },
+            '& input[type=number]': {
+              '-moz-appearance': 'textfield',
+            },
           },
           '& .MuiInputLabel-root': {
             color: designTokens.colors.foreground.muted,

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="tomato-gradient-lg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5E6AD2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4348D0;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow-lg">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#050506" />
+
+  <!-- Tomato body -->
+  <ellipse cx="90" cy="95" rx="55" ry="48" fill="url(#tomato-gradient-lg)" filter="url(#glow-lg)" />
+
+  <!-- Stem -->
+  <path d="M90 47 L90 28 L78 12 M90 28 L102 12" stroke="#10B981" stroke-width="7" stroke-linecap="round" fill="none" />
+
+  <!-- Highlight -->
+  <ellipse cx="70" cy="80" rx="12" ry="9" fill="rgba(255,255,255,0.15)" transform="rotate(-20 70 80)" />
+</svg>

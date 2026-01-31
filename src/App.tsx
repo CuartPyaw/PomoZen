@@ -33,7 +33,8 @@ import {
   DialogContent,
   IconButton,
   Tooltip,
-  Zoom
+  Zoom,
+  ThemeProvider
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
@@ -41,6 +42,9 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createDarkTheme } from './theme';
+import './styles/background.css';
 import './App.css';
 
 // 类型定义
@@ -872,21 +876,40 @@ function App() {
 
   const { radius, circumference, offset } = getProgressParams();
 
-  // 定义模式颜色
   const modeColors = {
-    focus: { primary: '#667eea', primaryDark: '#5568d3', bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-    break: { primary: '#11998e', primaryDark: '#0f8a82', bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-    longBreak: { primary: '#4facfe', primaryDark: '#3d9bde', bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    focus: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
+    break: { primary: '#10B981', bright: '#34D399', glow: 'rgba(16,185,129,0.3)' },
+    longBreak: { primary: '#6366F1', bright: '#818CF8', glow: 'rgba(99,102,241,0.3)' },
   };
 
   const themeColor = modeColors[mode];
 
   return (
-    <Box sx={{ minHeight: '100vh', background: themeColor.bg, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+    <ThemeProvider theme={createDarkTheme()}>
+      <CssBaseline />
+      <Box sx={{ minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* 背景系统 */}
+        <div className="app-background" />
+        <div className="ambient-blobs">
+          <div className="blob-primary" />
+          <div className="blob-secondary" />
+          <div className="blob-tertiary" />
+          <div className="blob-accent" />
+        </div>
+        <div className="grid-overlay" />
+
       {/* 顶部 AppBar */}
       <AppBar position="static" elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
         <Toolbar sx={{ justifyContent: 'center' }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            className="gradient-title"
+            sx={{
+              fontWeight: 'bold',
+              letterSpacing: '-0.02em',
+            }}
+          >
             番茄钟
           </Typography>
         </Toolbar>
@@ -895,17 +918,20 @@ function App() {
       <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', py: 2 }}>
         {/* 模式切换按钮组 */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 4, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(255,255,255,0.3)' } }}>
+          <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(255,255,255,0.06)' } }}>
             <Tooltip title="快捷键: 1" arrow TransitionComponent={Zoom}>
               <Button
                 onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
                 sx={{
-                  minWidth: 90,
-                  borderRadius: 4,
-                  bgcolor: mode === 'focus' ? 'rgba(255,255,255,0.95)' : 'transparent',
-                  color: mode === 'focus' ? themeColor.primary : 'white',
-                  borderColor: 'rgba(255,255,255,0.3)',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                  minWidth: 100,
+                  borderRadius: 2,
+                  bgcolor: mode === 'focus' ? themeColor.primary : 'transparent',
+                  color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                  borderColor: mode === 'focus' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                  '&:hover': {
+                    bgcolor: mode === 'focus' ? themeColor.bright : 'rgba(255,255,255,0.05)',
+                    color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  },
                 }}
               >
                 专注
@@ -915,12 +941,15 @@ function App() {
               <Button
                 onClick={() => mode !== 'break' && handleManualModeToggle('break')}
                 sx={{
-                  minWidth: 90,
-                  borderRadius: 4,
-                  bgcolor: mode === 'break' ? 'rgba(255,255,255,0.95)' : 'transparent',
-                  color: mode === 'break' ? modeColors.break.primary : 'white',
-                  borderColor: 'rgba(255,255,255,0.3)',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                  minWidth: 100,
+                  borderRadius: 2,
+                  bgcolor: mode === 'break' ? modeColors.break.primary : 'transparent',
+                  color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                  borderColor: mode === 'break' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                  '&:hover': {
+                    bgcolor: mode === 'break' ? modeColors.break.bright : 'rgba(255,255,255,0.05)',
+                    color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  },
                 }}
               >
                 短休息
@@ -930,12 +959,15 @@ function App() {
               <Button
                 onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
                 sx={{
-                  minWidth: 90,
-                  borderRadius: 4,
-                  bgcolor: mode === 'longBreak' ? 'rgba(255,255,255,0.95)' : 'transparent',
-                  color: mode === 'longBreak' ? modeColors.longBreak.primary : 'white',
-                  borderColor: 'rgba(255,255,255,0.3)',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                  minWidth: 100,
+                  borderRadius: 2,
+                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'transparent',
+                  color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                  borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                  '&:hover': {
+                    bgcolor: mode === 'longBreak' ? modeColors.longBreak.bright : 'rgba(255,255,255,0.05)',
+                    color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  },
                 }}
               >
                 长休息
@@ -946,13 +978,25 @@ function App() {
 
         {/* 计时器卡片 */}
         <Card
-          elevation={8}
+          elevation={0}
           sx={{
-            borderRadius: 6,
+            borderRadius: 4,
             mb: 3,
-            bgcolor: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
+            bgcolor: 'transparent',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.06)',
             overflow: 'visible',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.1), transparent)',
+              borderRadius: '16px 16px 0 0',
+            },
           }}
         >
           <CardContent sx={{ pb: 3, pt: 4, px: 2 }}>
@@ -964,7 +1008,7 @@ function App() {
                   cy={130}
                   r={radius}
                   fill="none"
-                  stroke="rgba(0,0,0,0.06)"
+                  stroke="rgba(255,255,255,0.06)"
                   strokeWidth={12}
                 />
                 <circle
@@ -977,7 +1021,7 @@ function App() {
                   strokeDasharray={circumference}
                   strokeDashoffset={offset}
                   strokeLinecap="round"
-                  style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                  style={{ transition: 'stroke-dashoffset 0.3s ease', filter: `drop-shadow(0 0 8px ${themeColor.glow})` }}
                 />
               </svg>
               <Box sx={{ position: 'absolute', textAlign: 'center' }}>
@@ -991,7 +1035,14 @@ function App() {
                   <Chip
                     label={getCycleInfo()}
                     size="small"
-                    sx={{ mt: 1, bgcolor: themeColor.primary, color: 'white' }}
+                    sx={{
+                      mt: 1,
+                      bgcolor: themeColor.primary,
+                      color: '#ffffff',
+                      border: 'none',
+                      fontWeight: 500,
+                      boxShadow: `0 0 0 1px ${themeColor.glow}, 0 4px 12px ${themeColor.glow}`,
+                    }}
                   />
                 )}
               </Box>
@@ -1010,9 +1061,9 @@ function App() {
                 sx={{
                   px: 4,
                   py: 1.5,
-                  borderRadius: 4,
+                  borderRadius: 2,
                   bgcolor: themeColor.primary,
-                  '&:hover': { bgcolor: themeColor.primaryDark },
+                  '&:hover': { bgcolor: themeColor.bright },
                 }}
               >
                 {isRunning ? '暂停' : '开始'}
@@ -1027,10 +1078,10 @@ function App() {
                 sx={{
                   px: 4,
                   py: 1.5,
-                  borderRadius: 4,
+                  borderRadius: 2,
                   borderColor: themeColor.primary,
                   color: themeColor.primary,
-                  '&:hover': { borderColor: themeColor.primaryDark, bgcolor: `${themeColor.primary}10` },
+                  '&:hover': { borderColor: themeColor.bright, bgcolor: `${themeColor.primary}15` },
                 }}
               >
                 重置
@@ -1040,21 +1091,21 @@ function App() {
         </Card>
 
         {/* 键盘快捷键提示 */}
-        <Card elevation={2} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(5px)' }}>
+        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <CardContent sx={{ py: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <KeyboardIcon sx={{ color: 'white', fontSize: 18 }} />
-              <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+              <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
                 快捷键
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-              <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
-              <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
-              <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
-              <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
-              <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
-              <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.75rem' }} />
+              <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
             </Box>
           </CardContent>
         </Card>
@@ -1067,9 +1118,14 @@ function App() {
           position: 'fixed',
           bottom: 24,
           right: 24,
-          bgcolor: 'rgba(255,255,255,0.95)',
-          color: themeColor.primary,
-          '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+          bgcolor: 'rgba(255,255,255,0.08)',
+          color: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          '&:hover': {
+            bgcolor: 'rgba(255,255,255,0.12)',
+            color: 'rgba(255,255,255,1)',
+          },
         }}
         aria-label="设置"
       >
@@ -1234,7 +1290,8 @@ function App() {
           </DialogContent>
         </Dialog>
       )}
-    </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 

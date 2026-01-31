@@ -1,0 +1,268 @@
+/**
+ * Linear/Modern 设计系统背景样式
+ *
+ * 实现多层背景系统：
+ * - 基础渐变层
+ * - 噪点纹理层
+ * - 动态光斑层
+ * - 网格覆盖层
+ *
+ * @module background
+ */
+
+/* 基础渐变背景 - 创建垂直深度 */
+.app-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at top, #0a0a0f 0%, #050506 50%, #020203 100%);
+  z-index: -2;
+}
+
+/* 噪点纹理层 - 添加触感质感，防止色带 */
+.app-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* 动态光斑层 - 创建电影级照明效果 */
+.ambient-blobs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 主光斑 - 顶部中央，主要强调色 */
+.blob-primary {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 1400px;
+  background: radial-gradient(ellipse, rgba(94, 106, 210, 0.25) 0%, transparent 70%);
+  filter: blur(150px);
+  animation: float-primary 10s ease-in-out infinite;
+}
+
+/* 次要光斑 - 左侧，紫/粉色调 */
+.blob-secondary {
+  position: absolute;
+  top: 20%;
+  left: -200px;
+  width: 600px;
+  height: 800px;
+  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  filter: blur(120px);
+  animation: float-secondary 9s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+/* 第三光斑 - 右侧，靛蓝/蓝调 */
+.blob-tertiary {
+  position: absolute;
+  bottom: 10%;
+  right: -150px;
+  width: 500px;
+  height: 700px;
+  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  filter: blur(100px);
+  animation: float-tertiary 8s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+/* 底部强调光斑 - 呼吸动画 */
+.blob-accent {
+  position: absolute;
+  bottom: -100px;
+  left: 30%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(94, 106, 210, 0.10) 0%, transparent 70%);
+  filter: blur(130px);
+  animation: pulse-accent 12s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+/* 光斑浮动动画 */
+@keyframes float-primary {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-20px) rotate(1deg);
+  }
+}
+
+@keyframes float-secondary {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(2deg);
+  }
+}
+
+@keyframes float-tertiary {
+  0%, 100% {
+    transform: translateY(0) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-25px) rotate(-1deg);
+  }
+}
+
+@keyframes pulse-accent {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* 网格覆盖层 - 添加技术精度感 */
+.grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  opacity: 0.02;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 1) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center center;
+}
+
+/* 渐变标题样式 */
+.gradient-title {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.7) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* 强调色渐变文字 */
+.gradient-accent {
+  background: linear-gradient(to right, #5E6AD2, #6366F1, #5E6AD2);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* 减弱动画 - 尊重用户偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .blob-primary,
+  .blob-secondary,
+  .blob-tertiary,
+  .blob-accent {
+    animation: none;
+  }
+  .gradient-accent {
+    animation: none;
+  }
+}
+
+/* 卡片鼠标跟踪聚光灯效果 */
+.card-spotlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(94, 106, 210, 0.15),
+    transparent
+  );
+  border-radius: inherit;
+}
+
+.card-root:hover .card-spotlight {
+  opacity: 1;
+}
+
+/* 按钮光泽效果 */
+.button-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.button-shine:hover::after {
+  left: 100%;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: transparent;
+  background-clip: padding-box;
+}

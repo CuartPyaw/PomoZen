@@ -42,6 +42,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createDarkTheme } from './theme';
 import './styles/background.css';
@@ -83,6 +84,12 @@ const STORAGE_KEYS = {
   CUSTOM_BREAK_TIME: 'tomato-customBreakTime',         // 自定义短休息时长
   CUSTOM_LONG_BREAK_TIME: 'tomato-customLongBreakTime', // 自定义长休息时长
   CURRENT_MODE: 'tomato-current-mode',          // 当前模式
+  TIME_LEFT_FOCUS: 'tomato-timeLeft-focus',     // 专注模式剩余时间
+  TIME_LEFT_BREAK: 'tomato-timeLeft-break',     // 短休息模式剩余时间
+  TIME_LEFT_LONG_BREAK: 'tomato-timeLeft-longBreak', // 长休息模式剩余时间
+  RUNNING_FOCUS: 'tomato-running-focus',         // 专注模式运行状态
+  RUNNING_BREAK: 'tomato-running-break',         // 短休息模式运行状态
+  RUNNING_LONG_BREAK: 'tomato-running-longBreak', // 长休息模式运行状态
 } as const;
 
 // 组件定义
@@ -107,12 +114,6 @@ function App() {
    * @default 'focus'
    */
   const [mode, setMode] = useState<TimerMode>('focus');
-
-  /**
-   * 计时器运行状态
-   * @default false
-   */
-  const [isRunning, setIsRunning] = useState(false);
 
   /**
    * 设置面板显示状态
@@ -169,7 +170,7 @@ function App() {
    * 防止计时器完成时重复触发
    * @default false
    */
-  const [completionGuard, setCompletionGuard] = useState(false);
+  const [_completionGuard, setCompletionGuard] = useState(false);
 
   /**
    * 自定义专注时长（单位：秒）
@@ -220,43 +221,93 @@ function App() {
   });
 
   /**
-   * 剩余时间（单位：秒）
-   * 根据当前模式和自定义时长初始化
+   * 每个模式的剩余时间记录
+   * 切换模式时保存和恢复
    */
-  const [timeLeft, setTimeLeft] = useState(() => {
-    // 从 localStorage 恢复上次使用的模式
-    const currentMode = localStorage.getItem(STORAGE_KEYS.CURRENT_MODE) as TimerMode || 'focus';
-    if (currentMode === 'focus') {
-      const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_FOCUS_TIME);
+  const [timeLeftForMode, setTimeLeftForMode] = useState<Record<TimerMode, number>>(() => {
+    const loadTime = (key: string, defaultTime: number) => {
+      const saved = localStorage.getItem(key);
       if (saved !== null) {
         const time = parseInt(saved, 10);
         if (!isNaN(time) && time >= 60 && time <= 7200) {
           return time;
         }
       }
-      return DEFAULT_FOCUS_TIME;
-    } else if (currentMode === 'break') {
-      const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_BREAK_TIME);
+      return defaultTime;
+    };
+
+    return {
+      focus: loadTime(STORAGE_KEYS.TIME_LEFT_FOCUS, DEFAULT_FOCUS_TIME),
+      break: loadTime(STORAGE_KEYS.TIME_LEFT_BREAK, DEFAULT_BREAK_TIME),
+      longBreak: loadTime(STORAGE_KEYS.TIME_LEFT_LONG_BREAK, DEFAULT_LONG_BREAK_TIME),
+    };
+  });
+
+  /**
+   * 每个模式的运行状态
+   */
+  const [isRunningForMode, setIsRunningForMode] = useState<Record<TimerMode, boolean>>(() => {
+    const loadRunning = (key: string): boolean => {
+      const saved = localStorage.getItem(key);
       if (saved !== null) {
-        const time = parseInt(saved, 10);
-        if (!isNaN(time) && time >= 60 && time <= 7200) {
-          return time;
-        }
+        return saved === 'true';
       }
-      return DEFAULT_BREAK_TIME;
-    } else {
-      const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_LONG_BREAK_TIME);
-      if (saved !== null) {
-        const time = parseInt(saved, 10);
-        if (!isNaN(time) && time >= 60 && time <= 7200) {
-          return time;
-        }
-      }
-      return DEFAULT_LONG_BREAK_TIME;
-    }
+      return false;
+    };
+
+    return {
+      focus: loadRunning(STORAGE_KEYS.RUNNING_FOCUS),
+      break: loadRunning(STORAGE_KEYS.RUNNING_BREAK),
+      longBreak: loadRunning(STORAGE_KEYS.RUNNING_LONG_BREAK),
+    };
   });
 
 // 工具函数和 Ref
+
+  /**
+   * 计时器 Worker 实例引用
+   * 在独立线程中运行计时逻辑
+   */
+  const timerWorkerRef = useRef<Worker | null>(null);
+
+  /**
+   * 初始化计时器 Worker
+   * 设置消息监听器
+   */
+  useEffect(() => {
+    const worker = new Worker(new URL('./workers/timerWorker.ts', import.meta.url), {
+      type: 'module',
+    });
+    timerWorkerRef.current = worker;
+
+    worker.onmessage = (e: MessageEvent) => {
+      const data = e.data;
+      const { type, mode } = data;
+
+      if (type === 'UPDATE') {
+        setIsRunningForMode((prev) => ({ ...prev, [mode]: true }));
+        setTimeLeftForMode((prev) => ({ ...prev, [mode]: data.timeLeft }));
+
+        try {
+          const key = mode === 'focus'
+            ? STORAGE_KEYS.TIME_LEFT_FOCUS
+            : mode === 'break'
+            ? STORAGE_KEYS.TIME_LEFT_BREAK
+            : STORAGE_KEYS.TIME_LEFT_LONG_BREAK;
+          localStorage.setItem(key, String(data.timeLeft));
+        } catch (error) {
+          console.error('Failed to save time left:', error);
+        }
+      } else if (type === 'COMPLETE') {
+        setIsRunningForMode((prev) => ({ ...prev, [mode]: false }));
+        handleTimerComplete(mode);
+      }
+    };
+
+    return () => {
+      worker.terminate();
+    };
+  }, []);
 
   /**
    * 获取当前模式对应的专注时长
@@ -459,18 +510,18 @@ function App() {
   }, [customLongBreakTime]);
 
   /**
-   * 模式切换时重置剩余时间
-   * 每次模式变化时触发
+   * 保存运行状态到 localStorage
+   * 每次运行状态变化时触发
    */
   useEffect(() => {
-    const currentTime =
-      mode === 'focus'
-        ? getFocusTime()
-        : mode === 'break'
-        ? getBreakTime()
-        : getLongBreakTime();
-    setTimeLeft(currentTime);
-  }, [mode]);
+    try {
+      localStorage.setItem(STORAGE_KEYS.RUNNING_FOCUS, String(isRunningForMode.focus));
+      localStorage.setItem(STORAGE_KEYS.RUNNING_BREAK, String(isRunningForMode.break));
+      localStorage.setItem(STORAGE_KEYS.RUNNING_LONG_BREAK, String(isRunningForMode.longBreak));
+    } catch (error) {
+      console.error('Failed to save running states:', error);
+    }
+  }, [isRunningForMode]);
 
   /**
    * 组件卸载时清理定时器
@@ -486,35 +537,12 @@ function App() {
 
 // 计时器核心逻辑
 
-  /**
-   * 计时器运行逻辑
-   * 每秒递减剩余时间，到0时触发完成处理
-   * 依赖项包括所有可能影响计时的状态
-   */
-  useEffect(() => {
-    if (!isRunning) {
-      setCompletionGuard(false);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev === 1) {
-          handleTimerComplete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, mode, autoSwitch, autoStart, pomodoroCycle, customFocusTime, customBreakTime, customLongBreakTime]);
-
 // 键盘快捷键
 
   /**
    * 键盘快捷键监听
    * - Space/Enter: 开始/暂停
+   * - S: 跳过到下一个模式
    * - R: 重置
    * - 1: 专注模式
    * - 2: 短休息模式
@@ -545,6 +573,11 @@ function App() {
           e.preventDefault();
           handleStartPause();
           break;
+        case 's':
+        case 'S':
+          e.preventDefault();
+          handleSkip();
+          break;
         case 'r':
         case 'R':
           handleReset();
@@ -563,7 +596,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [showSettings, isRunning]);
+    }, [showSettings, isRunningForMode]);
 
 // 通知功能
 
@@ -624,74 +657,59 @@ function App() {
    * 4. 如果启用自动切换，延迟后切换模式
    *
    * 使用 completionGuard 防止重复触发
+   * @param completedMode - 完成的模式
    */
-  const handleTimerComplete = () => {
-    // 防止重复触发
-    if (completionGuard) {
-      return;
-    }
-    setCompletionGuard(true);
+  const handleTimerComplete = (completedMode: TimerMode) => {
+    setCompletionGuard((prev) => {
+      if (prev) return prev;
 
-    // 停止计时器
-    setIsRunning(false);
-
-    // 确定下一个模式
-    let nextMode: TimerMode | null = null;
-
-    if (mode === 'focus') {
-      // 专注完成 → 短休息
-      nextMode = 'break';
-    } else if (mode === 'break') {
-      // 短休息完成 → 根据周期决定下一个模式
-      if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
-        // 完成5个周期 → 长休息
-        nextMode = 'longBreak';
-      } else {
-        // 周期未完成 → 继续专注
-        nextMode = 'focus';
-      }
-    } else if (mode === 'longBreak') {
-      // 长休息完成 → 重置周期，开始新的循环
-      nextMode = 'focus';
-    }
-
-    // 发送完成通知
-    if (nextMode) {
-      if (mode === 'focus') {
+      if (completedMode === 'focus') {
         sendNotification('专注结束', '时间到了！该休息一下了');
-      } else if (mode === 'break') {
+      } else if (completedMode === 'break') {
         sendNotification('休息结束', '休息完成！开始专注吧');
-      } else if (mode === 'longBreak') {
+      } else if (completedMode === 'longBreak') {
         sendNotification('长休息结束', '休息完成！开始新的番茄钟周期');
       }
-    }
 
-    // 如果未启用自动切换，直接返回
-    if (!autoSwitch) {
-      return;
-    }
-
-    // 清除旧的切换定时器
-    if (switchTimeoutRef.current) {
-      clearTimeout(switchTimeoutRef.current);
-    }
-
-    // 延迟切换模式（给用户2秒时间看到完成状态）
-    switchTimeoutRef.current = setTimeout(() => {
-      if (mode === 'focus') {
-        switchToMode('break', autoStart);
-      } else if (mode === 'break') {
-        if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
-          switchToMode('longBreak', autoStart);
-        } else {
-          setPomodoroCycle(pomodoroCycle + 1);
-          switchToMode('focus', autoStart);
-        }
-      } else if (mode === 'longBreak') {
-        setPomodoroCycle(1);
-        switchToMode('focus', autoStart);
+      if (!autoSwitch) {
+        return true;
       }
-    }, MODE_SWITCH_DELAY);
+
+      let nextMode: TimerMode;
+
+      if (completedMode === 'focus') {
+        nextMode = 'break';
+      } else if (completedMode === 'break') {
+        if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
+          nextMode = 'longBreak';
+        } else {
+          nextMode = 'focus';
+        }
+      } else {
+        nextMode = 'focus';
+      }
+
+      if (completedMode === 'longBreak') {
+        setPomodoroCycle(1);
+      } else if (completedMode === 'break') {
+        setPomodoroCycle(pomodoroCycle + 1);
+      }
+
+      setTimeout(() => {
+        setMode(nextMode);
+
+        if (autoStart) {
+          timerWorkerRef.current?.postMessage({
+            type: 'START',
+            mode: nextMode,
+            initialTime: timeLeftForMode[nextMode],
+          });
+          setIsRunningForMode((prev) => ({ ...prev, [nextMode]: true }));
+        }
+      }, MODE_SWITCH_DELAY);
+
+      return true;
+    });
   };
 
 // 模式切换
@@ -703,24 +721,26 @@ function App() {
    */
   const switchToMode = (newMode: TimerMode, shouldAutoStart: boolean = false) => {
     setCompletionGuard(false);
-    setMode(newMode);
-    const time =
-      newMode === 'focus'
-        ? getFocusTime()
-        : newMode === 'break'
-        ? getBreakTime()
-        : getLongBreakTime();
-    setTimeLeft(time);
 
-    // 保存当前模式到 localStorage
+    setMode(newMode);
+
     try {
       localStorage.setItem(STORAGE_KEYS.CURRENT_MODE, newMode);
     } catch (error) {
       console.error('Failed to save current mode:', error);
     }
 
-    setIsRunning(shouldAutoStart);
+    if (shouldAutoStart) {
+      timerWorkerRef.current?.postMessage({
+        type: 'START',
+        mode: newMode,
+        initialTime: timeLeftForMode[newMode],
+      });
+      setIsRunningForMode((prev) => ({ ...prev, [newMode]: true }));
+    }
   };
+
+  void switchToMode;
 
 // UI 辅助函数
 
@@ -754,7 +774,7 @@ function App() {
   const getProgressParams = () => {
     const radius = 123;
     const circumference = 2 * Math.PI * radius;
-    const progress = timeLeft / getTotalTime();
+    const progress = displayTime / getTotalTime();
     const offset = circumference * (1 - progress);
     return { radius, circumference, offset };
   };
@@ -792,10 +812,23 @@ function App() {
    * 切换计时器运行状态
    */
   const handleStartPause = () => {
-    if (!isRunning) {
+    const isCurrentRunning = isRunningForMode[mode];
+
+    if (!isCurrentRunning) {
       setCompletionGuard(false);
+      timerWorkerRef.current?.postMessage({
+        type: 'START',
+        mode,
+        initialTime: timeLeftForMode[mode],
+      });
+      setIsRunningForMode((prev) => ({ ...prev, [mode]: true }));
+    } else {
+      timerWorkerRef.current?.postMessage({
+        type: 'PAUSE',
+        mode,
+      });
+      setIsRunningForMode((prev) => ({ ...prev, [mode]: false }));
     }
-    setIsRunning(!isRunning);
   };
 
   /**
@@ -803,16 +836,98 @@ function App() {
    * 重置计时器和周期计数
    */
   const handleReset = () => {
-    setIsRunning(false);
+    setIsRunningForMode((prev) => ({ ...prev, [mode]: false }));
     setCompletionGuard(false);
-    setTimeLeft(
+
+    const resetTime =
       mode === 'focus'
         ? getFocusTime()
         : mode === 'break'
         ? getBreakTime()
-        : getLongBreakTime(),
-    );
+        : getLongBreakTime();
+
+    setTimeLeftForMode((prev) => ({ ...prev, [mode]: resetTime }));
+
+    timerWorkerRef.current?.postMessage({
+      type: 'RESET',
+      mode,
+      initialTime: resetTime,
+    });
+
+    setTimeLeftForMode((prev) => {
+      try {
+        localStorage.setItem(STORAGE_KEYS.TIME_LEFT_FOCUS, String(prev.focus));
+        localStorage.setItem(STORAGE_KEYS.TIME_LEFT_BREAK, String(prev.break));
+        localStorage.setItem(STORAGE_KEYS.TIME_LEFT_LONG_BREAK, String(prev.longBreak));
+        localStorage.setItem(STORAGE_KEYS.RUNNING_FOCUS, String(isRunningForMode.focus));
+        localStorage.setItem(STORAGE_KEYS.RUNNING_BREAK, String(isRunningForMode.break));
+        localStorage.setItem(STORAGE_KEYS.RUNNING_LONG_BREAK, String(isRunningForMode.longBreak));
+      } catch (error) {
+        console.error('Failed to save time left and running states:', error);
+      }
+      return prev;
+    });
+
     setPomodoroCycle(1);
+  };
+
+  /**
+   * 处理跳过按钮点击
+   * 停止当前模式计时，切换到下一个模式，重置时间
+   */
+  const handleSkip = () => {
+    timerWorkerRef.current?.postMessage({
+      type: 'PAUSE',
+      mode,
+    });
+    setIsRunningForMode((prev) => ({ ...prev, [mode]: false }));
+    setCompletionGuard(false);
+
+    let nextMode: TimerMode;
+
+    if (mode === 'focus') {
+      nextMode = 'break';
+    } else if (mode === 'break') {
+      if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
+        nextMode = 'longBreak';
+      } else {
+        nextMode = 'focus';
+      }
+    } else {
+      nextMode = 'focus';
+    }
+
+    if (mode === 'longBreak') {
+      setPomodoroCycle(1);
+    } else if (mode === 'break') {
+      setPomodoroCycle(pomodoroCycle + 1);
+    }
+
+    const initialTime =
+      nextMode === 'focus'
+        ? getFocusTime()
+        : nextMode === 'break'
+        ? getBreakTime()
+        : getLongBreakTime();
+
+    setTimeLeftForMode((prev) => ({ ...prev, [nextMode]: initialTime }));
+
+    timerWorkerRef.current?.postMessage({
+      type: 'SET_TIME',
+      mode: nextMode,
+      time: initialTime,
+    });
+
+    setMode(nextMode);
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_MODE, nextMode);
+      localStorage.setItem(STORAGE_KEYS.TIME_LEFT_FOCUS, String(timeLeftForMode.focus));
+      localStorage.setItem(STORAGE_KEYS.TIME_LEFT_BREAK, String(timeLeftForMode.break));
+      localStorage.setItem(STORAGE_KEYS.TIME_LEFT_LONG_BREAK, String(timeLeftForMode.longBreak));
+    } catch (error) {
+      console.error('Failed to save time left and current mode:', error);
+    }
   };
 
   /**
@@ -823,7 +938,14 @@ function App() {
   const handleManualModeToggle = (newMode: TimerMode) => {
     setPomodoroCycle(1);
     setCompletionGuard(false);
-    switchToMode(newMode, false);
+
+    setMode(newMode);
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_MODE, newMode);
+    } catch (error) {
+      console.error('Failed to save current mode:', error);
+    }
   };
 
   /**
@@ -846,33 +968,48 @@ function App() {
    * @param minutes - 新的时间（分钟）
    */
   const handleTimeChange = (timeType: TimerMode, minutes: number) => {
-    // 限制时间范围：1-120分钟
     const newTime = Math.max(1, Math.min(120, minutes)) * 60;
+
     if (timeType === 'focus') {
       setCustomFocusTime(newTime);
-      // 如果当前是专注模式，立即更新剩余时间
-      if (mode === 'focus') {
-        setTimeLeft(newTime);
-        setCompletionGuard(false);
-      }
+      setTimeLeftForMode((prev) => ({ ...prev, [timeType]: newTime }));
+
+      timerWorkerRef.current?.postMessage({
+        type: 'SET_TIME',
+        mode: timeType,
+        time: newTime,
+      });
+
+      setCompletionGuard(false);
     } else if (timeType === 'break') {
       setCustomBreakTime(newTime);
-      // 如果当前是短休息模式，立即更新剩余时间
-      if (mode === 'break') {
-        setTimeLeft(newTime);
-        setCompletionGuard(false);
-      }
+      setTimeLeftForMode((prev) => ({ ...prev, [timeType]: newTime }));
+
+      timerWorkerRef.current?.postMessage({
+        type: 'SET_TIME',
+        mode: timeType,
+        time: newTime,
+      });
+
+      setCompletionGuard(false);
     } else if (timeType === 'longBreak') {
       setCustomLongBreakTime(newTime);
-      // 如果当前是长休息模式，立即更新剩余时间
-      if (mode === 'longBreak') {
-        setTimeLeft(newTime);
-        setCompletionGuard(false);
-      }
+      setTimeLeftForMode((prev) => ({ ...prev, [timeType]: newTime }));
+
+      timerWorkerRef.current?.postMessage({
+        type: 'SET_TIME',
+        mode: timeType,
+        time: newTime,
+      });
+
+      setCompletionGuard(false);
     }
   };
 
 // JSX 渲染
+
+const displayTime = timeLeftForMode[mode];
+const displayIsRunning = isRunningForMode[mode];
 
   const { radius, circumference, offset } = getProgressParams();
 
@@ -1024,10 +1161,10 @@ function App() {
                   style={{ transition: 'stroke-dashoffset 0.3s ease', filter: `drop-shadow(0 0 8px ${themeColor.glow})` }}
                 />
               </svg>
-              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h2" component="div" sx={{ fontSize: { xs: '2.5rem', md: '3rem' }, fontWeight: 'bold', color: 'text.primary' }}>
-                  {formatTime(timeLeft)}
-                </Typography>
+               <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                 <Typography variant="h2" component="div" sx={{ fontSize: { xs: '2.5rem', md: '3rem' }, fontWeight: 'bold', color: 'text.primary' }}>
+                   {formatTime(displayTime)}
+                 </Typography>
                 <Typography variant="h6" color="text.secondary" sx={{ mt: 1, fontWeight: 500 }}>
                   {getModeLabel()}
                 </Typography>
@@ -1052,12 +1189,12 @@ function App() {
           <Divider sx={{ mx: 3 }} />
 
           <CardActions sx={{ justifyContent: 'center', p: 3, gap: 2 }}>
-            <Tooltip title={isRunning ? '暂停 (空格)' : '开始 (空格)'} arrow TransitionComponent={Zoom}>
+            <Tooltip title={displayIsRunning ? '暂停 (空格)' : '开始 (空格)'} arrow TransitionComponent={Zoom}>
               <Button
                 variant="contained"
                 size="large"
                 onClick={handleStartPause}
-                startIcon={isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                startIcon={displayIsRunning ? <PauseIcon /> : <PlayArrowIcon />}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -1066,7 +1203,25 @@ function App() {
                   '&:hover': { bgcolor: themeColor.bright },
                 }}
               >
-                {isRunning ? '暂停' : '开始'}
+                {displayIsRunning ? '暂停' : '开始'}
+              </Button>
+            </Tooltip>
+            <Tooltip title="跳过 (S)" arrow TransitionComponent={Zoom}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleSkip}
+                startIcon={<SkipNextIcon />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  borderColor: themeColor.primary,
+                  color: themeColor.primary,
+                  '&:hover': { borderColor: themeColor.bright, bgcolor: `${themeColor.primary}15` },
+                }}
+              >
+                跳过
               </Button>
             </Tooltip>
             <Tooltip title="重置 (R)" arrow TransitionComponent={Zoom}>
@@ -1101,11 +1256,55 @@ function App() {
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
               <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* 运行状态面板 */}
+        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                运行状态
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Chip
+                label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
+                size="small"
+                sx={{
+                  bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              />
+              <Chip
+                label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
+                size="small"
+                sx={{
+                  bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              />
+              <Chip
+                label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
+                size="small"
+                sx={{
+                  bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              />
             </Box>
           </CardContent>
         </Card>

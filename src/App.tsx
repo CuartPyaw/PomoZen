@@ -90,6 +90,8 @@ const STORAGE_KEYS = {
   RUNNING_FOCUS: 'tomato-running-focus',         // 专注模式运行状态
   RUNNING_BREAK: 'tomato-running-break',         // 短休息模式运行状态
   RUNNING_LONG_BREAK: 'tomato-running-longBreak', // 长休息模式运行状态
+  TOTAL_FOCUS_TIME: 'tomato-total-focus-time',  // 总专注时长（秒）
+  FOCUS_SESSION_COUNT: 'tomato-focus-session-count', // 专注次数
 } as const;
 
 // 组件定义
@@ -260,6 +262,35 @@ function App() {
       break: loadRunning(STORAGE_KEYS.RUNNING_BREAK),
       longBreak: loadRunning(STORAGE_KEYS.RUNNING_LONG_BREAK),
     };
+  });
+
+  /**
+   * 总专注时长（单位：秒）
+   * 记录所有完成的专注模式的累计时长
+   */
+  const [totalFocusTime, setTotalFocusTime] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.TOTAL_FOCUS_TIME);
+    if (saved !== null) {
+      const time = parseInt(saved, 10);
+      if (!isNaN(time) && time >= 0) {
+        return time;
+      }
+    }
+    return 0;
+  });
+
+  /**
+   * 专注次数统计
+   */
+  const [focusSessionCount, setFocusSessionCount] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.FOCUS_SESSION_COUNT);
+    if (saved !== null) {
+      const count = parseInt(saved, 10);
+      if (!isNaN(count) && count >= 0) {
+        return count;
+      }
+    }
+    return 0;
   });
 
 // 工具函数和 Ref
@@ -524,6 +555,28 @@ function App() {
   }, [isRunningForMode]);
 
   /**
+   * 保存总专注时长到 localStorage
+   */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.TOTAL_FOCUS_TIME, String(totalFocusTime));
+    } catch (error) {
+      console.error('Failed to save total focus time:', error);
+    }
+  }, [totalFocusTime]);
+
+  /**
+   * 保存专注次数到 localStorage
+   */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.FOCUS_SESSION_COUNT, String(focusSessionCount));
+    } catch (error) {
+      console.error('Failed to save focus session count:', error);
+    }
+  }, [focusSessionCount]);
+
+  /**
    * 组件卸载时清理定时器
    * 防止内存泄漏
    */
@@ -663,7 +716,11 @@ function App() {
     setCompletionGuard((prev) => {
       if (prev) return prev;
 
+      // 专注模式完成时，累计专注时长和次数
       if (completedMode === 'focus') {
+        const completedTime = getFocusTime();
+        setTotalFocusTime((prev) => prev + completedTime);
+        setFocusSessionCount((prev) => prev + 1);
         sendNotification('专注结束', '时间到了！该休息一下了');
       } else if (completedMode === 'break') {
         sendNotification('休息结束', '休息完成！开始专注吧');
@@ -803,6 +860,21 @@ function App() {
       return `长休息`;
     }
     return `番茄钟周期: ${pomodoroCycle}/${POMODORO_CYCLE_COUNT}`;
+  };
+
+  /**
+   * 格式化总专注时长
+   * @returns 格式化后的时长字符串（如 "2小时30分钟" 或 "45分钟"）
+   */
+  const formatTotalFocusTime = (): string => {
+    const totalMinutes = Math.floor(totalFocusTime / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours > 0) {
+      return `${hours}小时${minutes}分钟`;
+    }
+    return `${minutes}分钟`;
   };
 
 // 事件处理函数
@@ -1003,6 +1075,17 @@ function App() {
       });
 
       setCompletionGuard(false);
+    }
+  };
+
+  /**
+   * 重置统计数据
+   * 清零总专注时长和专注次数
+   */
+  const handleResetStats = () => {
+    if (window.confirm('确定要重置所有统计数据吗？此操作不可撤销。')) {
+      setTotalFocusTime(0);
+      setFocusSessionCount(0);
     }
   };
 
@@ -1266,6 +1349,40 @@ const displayIsRunning = isRunningForMode[mode];
           </CardContent>
         </Card>
 
+        {/* 统计信息卡片 */}
+        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                📊 专注统计
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Chip
+                label={`总时长: ${formatTotalFocusTime()}`}
+                size="small"
+                sx={{
+                  bgcolor: modeColors.focus.primary,
+                  color: '#ffffff',
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  fontWeight: 500,
+                }}
+              />
+              <Chip
+                label={`专注次数: ${focusSessionCount}次`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.9)',
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              />
+            </Box>
+          </CardContent>
+        </Card>
+
         {/* 运行状态面板 */}
         <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
           <CardContent sx={{ py: 2 }}>
@@ -1469,6 +1586,41 @@ const displayIsRunning = isRunningForMode[mode];
                 sx={{ mb: 2 }}
               />
             )}
+
+            {/* 统计数据部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              📊 统计数据
+            </Typography>
+
+            <Card variant="outlined" sx={{ mb: 3, borderRadius: 3, bgcolor: 'action.hover' }}>
+              <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    累计专注时长
+                  </Typography>
+                  <Typography variant="body2" color={modeColors.focus.primary} fontWeight={600}>
+                    {formatTotalFocusTime()}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    专注次数
+                  </Typography>
+                  <Typography variant="body2" color="text.primary" fontWeight={600}>
+                    {focusSessionCount} 次
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  onClick={handleResetStats}
+                  sx={{ borderRadius: 3, borderColor: 'error.main', color: 'error.main', '&:hover': { bgcolor: 'error.main', color: '#ffffff' } }}
+                >
+                  重置统计数据
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* 循环模式说明 */}
             {autoSwitch && (

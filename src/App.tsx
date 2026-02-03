@@ -1328,103 +1328,106 @@ const displayIsRunning = isRunningForMode[mode];
           </CardActions>
         </Card>
 
-        {/* 键盘快捷键提示 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                快捷键
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-              <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-            </Box>
-          </CardContent>
-        </Card>
+        {/* 快捷键、专注统计、运行状态横向排布 */}
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {/* 键盘快捷键提示 */}
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  快捷键
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              </Box>
+            </CardContent>
+          </Card>
 
-        {/* 统计信息卡片 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                📊 专注统计
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Chip
-                label={`总时长: ${formatTotalFocusTime()}`}
-                size="small"
-                sx={{
-                  bgcolor: modeColors.focus.primary,
-                  color: '#ffffff',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  fontWeight: 500,
-                }}
-              />
-              <Chip
-                label={`专注次数: ${focusSessionCount}次`}
-                size="small"
-                sx={{
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-            </Box>
-          </CardContent>
-        </Card>
+          {/* 统计信息卡片 */}
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  📊 专注统计
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Chip
+                  label={`总时长: ${formatTotalFocusTime()}`}
+                  size="small"
+                  sx={{
+                    bgcolor: modeColors.focus.primary,
+                    color: '#ffffff',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    fontWeight: 500,
+                  }}
+                />
+                <Chip
+                  label={`专注次数: ${focusSessionCount}次`}
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
 
-        {/* 运行状态面板 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                运行状态
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Chip
-                label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-              <Chip
-                label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-              <Chip
-                label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-            </Box>
-          </CardContent>
-        </Card>
+          {/* 运行状态面板 */}
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  运行状态
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Chip
+                  label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+                <Chip
+                  label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+                <Chip
+                  label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
       </Container>
 
       {/* 设置按钮 */}

@@ -828,6 +828,16 @@ function App() {
         setPomodoroCycle(pomodoroCycle + 1);
       }
 
+      // 先设置新模式的完整时间，再切换
+      const nextModeTime =
+        nextMode === 'focus'
+          ? getFocusTime()
+          : nextMode === 'break'
+          ? getBreakTime()
+          : getLongBreakTime();
+
+      setTimeLeftForMode((prev) => ({ ...prev, [nextMode]: nextModeTime }));
+
       setTimeout(() => {
         setMode(nextMode);
 
@@ -835,7 +845,7 @@ function App() {
           timerWorkerRef.current?.postMessage({
             type: 'START',
             mode: nextMode,
-            initialTime: timeLeftForMode[nextMode],
+            initialTime: nextModeTime,
           });
           setIsRunningForMode((prev) => ({ ...prev, [nextMode]: true }));
         }

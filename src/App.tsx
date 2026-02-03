@@ -444,7 +444,7 @@ function App() {
    * 模式切换定时器引用
    * 用于在计时器完成后延迟切换模式
    */
-  const switchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const switchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 // 副作用：加载和保存设置
 

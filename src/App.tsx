@@ -142,7 +142,7 @@ function App() {
   /**
    * 通知弹窗定时器引用
    */
-  const notificationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
    * 自动切换模式开关

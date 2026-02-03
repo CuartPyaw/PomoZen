@@ -1644,24 +1644,14 @@ const displayIsRunning = isRunningForMode[mode];
             onClick={() => setShowStatsDialog(true)}
           >
             <CardContent sx={{ py: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              {/* 第一行：标题居中 */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
                   📊 专注统计
                 </Typography>
-                <Chip
-                  label="详情"
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: '0.7rem',
-                    bgcolor: 'rgba(94,106,210,0.2)',
-                    color: modeColors.focus.primary,
-                    border: '1px solid rgba(94,106,210,0.3)',
-                    fontWeight: 500,
-                  }}
-                />
               </Box>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {/* 第二行：总时长和专注次数并排 */}
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 2, flexWrap: 'wrap' }}>
                 <Chip
                   label={`总时长: ${formatTotalFocusTime()}`}
                   size="small"
@@ -1681,6 +1671,20 @@ const displayIsRunning = isRunningForMode[mode];
                     color: 'rgba(255,255,255,0.9)',
                     fontSize: '0.75rem',
                     border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+              </Box>
+              {/* 第三行：详细信息控件居中 */}
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Chip
+                  label="详细信息"
+                  sx={{
+                    height: 28,
+                    fontSize: '0.8rem',
+                    bgcolor: 'rgba(94,106,210,0.2)',
+                    color: modeColors.focus.primary,
+                    border: '1px solid rgba(94,106,210,0.3)',
+                    fontWeight: 500,
                   }}
                 />
               </Box>

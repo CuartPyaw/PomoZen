@@ -140,6 +140,11 @@ function App() {
   });
 
   /**
+   * 通知弹窗定时器引用
+   */
+  const notificationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  /**
    * 自动切换模式开关
    * 启用后，计时器完成会自动切换到下一个模式
    * @default true
@@ -680,6 +685,9 @@ function App() {
       if (switchTimeoutRef.current) {
         clearTimeout(switchTimeoutRef.current);
       }
+      if (notificationTimeoutRef.current) {
+        clearTimeout(notificationTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -735,10 +743,17 @@ function App() {
    * @param body - 通知内容
    */
   const sendNotification = (title: string, body: string) => {
+    // 清除之前的定时器，防止内存泄漏
+    if (notificationTimeoutRef.current) {
+      clearTimeout(notificationTimeoutRef.current);
+    }
+
     setNotificationDialog({ open: true, title, message: body });
+
     // 3秒后自动关闭
-    setTimeout(() => {
+    notificationTimeoutRef.current = setTimeout(() => {
       setNotificationDialog(prev => ({ ...prev, open: false }));
+      notificationTimeoutRef.current = null;
     }, 3000);
   };
 
@@ -1380,8 +1395,8 @@ const displayIsRunning = isRunningForMode[mode];
 
   const modeColors = {
     focus: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
-    break: { primary: '#10B981', bright: '#34D399', glow: 'rgba(16,185,129,0.3)' },
-    longBreak: { primary: '#6366F1', bright: '#818CF8', glow: 'rgba(99,102,241,0.3)' },
+    break: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
+    longBreak: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
   };
 
   const themeColor = modeColors[mode];

@@ -81,7 +81,6 @@ const MODE_SWITCH_DELAY = 2000;
 const STORAGE_KEYS = {
   AUTO_SWITCH: 'tomato-autoSwitch',           // 自动切换模式开关
   AUTO_START: 'tomato-autoStart',               // 自动开始计时开关
-  ENABLE_NOTIFICATIONS: 'tomato-enableNotifications',  // 桌面通知开关
   CUSTOM_FOCUS_TIME: 'tomato-customFocusTime',         // 自定义专注时长
   CUSTOM_BREAK_TIME: 'tomato-customBreakTime',         // 自定义短休息时长
   CUSTOM_LONG_BREAK_TIME: 'tomato-customLongBreakTime', // 自定义长休息时长
@@ -132,6 +131,15 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
 
   /**
+   * 通知弹窗状态
+   */
+  const [notificationDialog, setNotificationDialog] = useState({
+    open: false,
+    title: '',
+    message: ''
+  });
+
+  /**
    * 自动切换模式开关
    * 启用后，计时器完成会自动切换到下一个模式
    * @default true
@@ -149,23 +157,6 @@ function App() {
   const [autoStart, setAutoStart] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.AUTO_START);
     return saved ? saved === 'true' : true;
-  });
-
-  /**
-   * 桌面通知开关
-   * 计时器完成时发送桌面通知
-   * @default false（需用户授权）
-   */
-  const [enableNotifications, setEnableNotifications] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS);
-    if (saved !== null) {
-      return saved === 'true';
-    }
-    // 如果浏览器已授权通知，则默认启用
-    if ('Notification' in window && Notification.permission === 'granted') {
-      return true;
-    }
-    return false;
   });
 
   /**
@@ -480,16 +471,6 @@ function App() {
           console.log('⚠ autoStart not found, using default');
         }
 
-        // 加载通知设置
-        const savedEnableNotifications = localStorage.getItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS);
-        console.log('Raw enableNotifications value:', savedEnableNotifications);
-        if (savedEnableNotifications !== null) {
-          setEnableNotifications(savedEnableNotifications === 'true');
-          console.log('✓ Loaded enableNotifications:', savedEnableNotifications === 'true');
-        } else {
-          console.log('⚠ enableNotifications not found, using default');
-        }
-
         // 加载自定义专注时长
         const savedFocusTime = localStorage.getItem(STORAGE_KEYS.CUSTOM_FOCUS_TIME);
         console.log('Raw focusTime value:', savedFocusTime);
@@ -569,19 +550,6 @@ function App() {
       console.error('Failed to save autoStart:', error);
     }
   }, [autoStart]);
-
-  /**
-   * 保存通知设置到 localStorage
-   * 每次通知设置变化时触发
-   */
-  useEffect(() => {
-    try {
-      console.log('Saving enableNotifications:', enableNotifications);
-      localStorage.setItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS, String(enableNotifications));
-    } catch (error) {
-      console.error('Failed to save enableNotifications:', error);
-    }
-  }, [enableNotifications]);
 
   /**
    * 保存自定义专注时长到 localStorage
@@ -761,51 +729,17 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyPress);
     }, [showSettings, showStatsDialog]);
 
-// 通知功能
-
   /**
-   * 请求浏览器通知权限
-   * 用户点击授权按钮时调用
-   */
-  const requestNotificationPermission = () => {
-    if ('Notification' in window) {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          setEnableNotifications(true);
-          try {
-            localStorage.setItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS, 'true');
-            console.log('✓ Notification permission granted and saved');
-          } catch (error) {
-            console.error('Failed to save notification permission:', error);
-          }
-        } else if (permission === 'denied') {
-          console.log('⚠ Notification permission denied by user');
-          setEnableNotifications(false);
-          try {
-            localStorage.setItem(STORAGE_KEYS.ENABLE_NOTIFICATIONS, 'false');
-          } catch (error) {
-            console.error('Failed to save notification permission:', error);
-          }
-        } else {
-          console.log('ℹ Notification permission:', permission);
-        }
-      });
-    }
-  };
-
-  /**
-   * 发送桌面通知
+   * 显示通知弹窗
    * @param title - 通知标题
    * @param body - 通知内容
    */
   const sendNotification = (title: string, body: string) => {
-    if (enableNotifications && 'Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, {
-        body,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-      });
-    }
+    setNotificationDialog({ open: true, title, message: body });
+    // 3秒后自动关闭
+    setTimeout(() => {
+      setNotificationDialog(prev => ({ ...prev, open: false }));
+    }, 3000);
   };
 
 // 计时器完成处理
@@ -900,12 +834,6 @@ function App() {
         // 重置 completionGuard，允许下一个完成事件被处理
         setCompletionGuard(false);
         setMode(nextMode);
-
-        // 短休息切换到专注模式时的额外提醒
-        if (completedMode === 'break' && nextMode === 'focus') {
-          console.log('✓ Break → Focus switch, sending notification');
-          sendNotification('开始专注', '休息时间结束，准备开始专注工作！');
-        }
 
         if (autoStart) {
           timerWorkerRef.current?.postMessage({
@@ -1384,19 +1312,6 @@ function App() {
       localStorage.setItem(timeKey, String(newModeTime));
     } catch (error) {
       console.error('Failed to save mode and time:', error);
-    }
-  };
-
-  /**
-   * 处理通知开关切换
-   * 启用通知时请求浏览器权限
-   * @param enabled - 是否启用通知
-   */
-  const handleNotificationToggle = (enabled: boolean) => {
-    setEnableNotifications(enabled);
-    // 如果启用通知且未授权，请求权限
-    if (enabled && 'Notification' in window && Notification.permission === 'default') {
-      requestNotificationPermission();
     }
   };
 
@@ -1935,50 +1850,6 @@ const displayIsRunning = isRunningForMode[mode];
               </Box>
             </Stack>
 
-            {/* 通知设置部分 */}
-            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
-              🔔 通知设置
-            </Typography>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="body2">启用桌面通知</Typography>
-              <Switch
-                checked={enableNotifications}
-                onChange={(e) => handleNotificationToggle(e.target.checked)}
-                size="small"
-              />
-            </Box>
-
-            {enableNotifications && 'Notification' in window && Notification.permission !== 'granted' && (
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={requestNotificationPermission}
-                startIcon={<SettingsIcon />}
-                sx={{ mb: 2, borderRadius: 3 }}
-              >
-                授权通知权限
-              </Button>
-            )}
-
-            {enableNotifications && 'Notification' in window && Notification.permission === 'granted' && (
-              <Chip
-                label="✓ 通知已启用"
-                color="success"
-                size="small"
-                sx={{ mb: 2 }}
-              />
-            )}
-
-            {enableNotifications && !('Notification' in window) && (
-              <Chip
-                label="⚠️ 当前浏览器不支持通知"
-                color="warning"
-                size="small"
-                sx={{ mb: 2 }}
-              />
-            )}
-
             {/* 统计数据部分 */}
             <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
               📊 统计数据
@@ -2195,6 +2066,31 @@ const displayIsRunning = isRunningForMode[mode];
           </DialogContent>
         </Dialog>
       )}
+
+      {/* 通知弹窗 */}
+      <Dialog
+        open={notificationDialog.open}
+        onClose={() => setNotificationDialog(prev => ({ ...prev, open: false }))}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            bgcolor: 'rgba(10,10,12,0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 3, minWidth: 300 }}>
+          <Typography variant="h5" sx={{ mb: 1, fontWeight: 600, color: modeColors[mode].primary }}>
+            {notificationDialog.title}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {notificationDialog.message}
+          </Typography>
+        </DialogContent>
+      </Dialog>
       </Box>
     </ThemeProvider>
   );

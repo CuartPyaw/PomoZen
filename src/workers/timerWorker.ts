@@ -50,6 +50,7 @@ function startTimer(mode: TimerMode, initialTime: number): void {
     });
 
     if (states[mode].timeLeft === 0) {
+      console.log(`=== Worker: Timer ${mode} reached zero, sending COMPLETE ===`);
       stopTimer(mode);
       postMessage({ type: 'COMPLETE', mode });
     }

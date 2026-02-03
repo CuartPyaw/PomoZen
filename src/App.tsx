@@ -45,6 +45,8 @@ import KeyboardIcon from '@mui/icons-material/Keyboard';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createDarkTheme } from './theme';
+import type { DailyFocusRecord, ChartViewMode, TimeRange, DailyChartDataPoint, WeeklyChartDataPoint, FocusHistoryStorage } from './types/statistics';
+import { DailyLineChart, WeeklyBarChart } from './components/FocusCharts';
 import './styles/background.css';
 import './App.css';
 
@@ -92,6 +94,9 @@ const STORAGE_KEYS = {
   RUNNING_LONG_BREAK: 'tomato-running-longBreak', // 长休息模式运行状态
   TOTAL_FOCUS_TIME: 'tomato-total-focus-time',  // 总专注时长（秒）
   FOCUS_SESSION_COUNT: 'tomato-focus-session-count', // 专注次数
+  FOCUS_HISTORY: 'tomato-focus-history',        // 专注历史记录
+  CHART_VIEW_MODE: 'tomato-chart-view-mode',    // 图表视图模式
+  CHART_TIME_RANGE: 'tomato-chart-time-range',  // 图表时间范围
 } as const;
 
 // 组件定义
@@ -291,6 +296,52 @@ function App() {
       }
     }
     return 0;
+  });
+
+  /**
+   * 专注历史记录
+   * 按日期索引的 Map 结构，便于快速查找和更新
+   */
+  const [focusHistory, setFocusHistory] = useState<Map<string, DailyFocusRecord>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.FOCUS_HISTORY);
+    if (saved) {
+      try {
+        const data: FocusHistoryStorage = JSON.parse(saved);
+        const records = data.records || [];
+        const historyMap = new Map<string, DailyFocusRecord>();
+        records.forEach((record: DailyFocusRecord) => {
+          historyMap.set(record.date, record);
+        });
+        return historyMap;
+      } catch (error) {
+        console.error('Failed to parse focus history:', error);
+      }
+    }
+    return new Map();
+  });
+
+  /**
+   * 统计对话框显示状态
+   */
+  const [showStatsDialog, setShowStatsDialog] = useState(false);
+
+  /**
+   * 图表视图模式（每日/每周）
+   */
+  const [chartViewMode, setChartViewMode] = useState<ChartViewMode>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.CHART_VIEW_MODE);
+    return (saved === 'weekly' ? 'weekly' : 'daily');
+  });
+
+  /**
+   * 图表时间范围
+   */
+  const [chartTimeRange, setChartTimeRange] = useState<TimeRange>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.CHART_TIME_RANGE);
+    if (saved && ['7days', '30days', '90days', 'all'].includes(saved)) {
+      return saved as TimeRange;
+    }
+    return '30days';
   });
 
 // 工具函数和 Ref
@@ -577,6 +628,47 @@ function App() {
   }, [focusSessionCount]);
 
   /**
+   * 保存专注历史到 localStorage
+   */
+  useEffect(() => {
+    try {
+      const records = Array.from(focusHistory.values())
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      const data = {
+        records,
+        lastUpdated: Date.now()
+      };
+
+      localStorage.setItem(STORAGE_KEYS.FOCUS_HISTORY, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save focus history:', error);
+    }
+  }, [focusHistory]);
+
+  /**
+   * 保存图表视图模式到 localStorage
+   */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CHART_VIEW_MODE, chartViewMode);
+    } catch (error) {
+      console.error('Failed to save chart view mode:', error);
+    }
+  }, [chartViewMode]);
+
+  /**
+   * 保存图表时间范围到 localStorage
+   */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CHART_TIME_RANGE, chartTimeRange);
+    } catch (error) {
+      console.error('Failed to save chart time range:', error);
+    }
+  }, [chartTimeRange]);
+
+  /**
    * 组件卸载时清理定时器
    * 防止内存泄漏
    */
@@ -597,21 +689,28 @@ function App() {
    * - Space/Enter: 开始/暂停
    * - S: 跳过到下一个模式
    * - R: 重置
+   * - D: 打开/关闭统计对话框
    * - 1: 专注模式
    * - 2: 短休息模式
    * - 3: 长休息模式
-   * - Esc: 关闭设置窗口
+   * - Esc: 关闭设置窗口/统计对话框
    */
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // 如果统计对话框打开且按了 Esc，关闭统计对话框
+      if (showStatsDialog && e.key === 'Escape') {
+        setShowStatsDialog(false);
+        return;
+      }
+
       // 如果设置窗口打开且按了 Esc，关闭设置窗口
       if (showSettings && e.key === 'Escape') {
         setShowSettings(false);
         return;
       }
 
-      // 如果设置窗口打开，阻止其他快捷键
-      if (showSettings) {
+      // 如果设置窗口或统计对话框打开，阻止其他快捷键
+      if (showSettings || showStatsDialog) {
         return;
       }
 
@@ -635,6 +734,11 @@ function App() {
         case 'R':
           handleReset();
           break;
+        case 'd':
+        case 'D':
+          e.preventDefault();
+          setShowStatsDialog(prev => !prev);
+          break;
         case '1':
           handleManualModeToggle('focus');
           break;
@@ -649,7 +753,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [showSettings, isRunningForMode]);
+    }, [showSettings, showStatsDialog, isRunningForMode]);
 
 // 通知功能
 
@@ -721,6 +825,7 @@ function App() {
         const completedTime = getFocusTime();
         setTotalFocusTime((prev) => prev + completedTime);
         setFocusSessionCount((prev) => prev + 1);
+        updateTodayFocusRecord(completedTime);
         sendNotification('专注结束', '时间到了！该休息一下了');
       } else if (completedMode === 'break') {
         sendNotification('休息结束', '休息完成！开始专注吧');
@@ -875,6 +980,173 @@ function App() {
       return `${hours}小时${minutes}分钟`;
     }
     return `${minutes}分钟`;
+  };
+
+// 统计数据管理函数
+
+  /**
+   * 获取今日日期字符串（YYYY-MM-DD）
+   * @returns 今日日期字符串
+   */
+  const getTodayDateString = (): string => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  /**
+   * 更新今日专注记录
+   * 在专注完成时调用
+   * @param duration - 完成的专注时长（秒）
+   */
+  const updateTodayFocusRecord = (duration: number) => {
+    const today = getTodayDateString();
+
+    setFocusHistory((prev) => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(today);
+
+      if (existing) {
+        newMap.set(today, {
+          ...existing,
+          totalDuration: existing.totalDuration + duration,
+          sessionCount: existing.sessionCount + 1,
+          sessions: [
+            ...(existing.sessions || []),
+            {
+              startTime: Date.now(),
+              duration
+            }
+          ]
+        });
+      } else {
+        newMap.set(today, {
+          date: today,
+          totalDuration: duration,
+          sessionCount: 1,
+          sessions: [{
+            startTime: Date.now(),
+            duration
+          }]
+        });
+      }
+
+      return newMap;
+    });
+  };
+
+  /**
+   * 根据时间范围获取过滤后的历史记录
+   * @returns 过滤后的历史记录数组
+   */
+  const getFilteredHistory = (): DailyFocusRecord[] => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let cutoffDate = new Date(today);
+
+    switch (chartTimeRange) {
+      case '7days':
+        cutoffDate.setDate(today.getDate() - 6);
+        break;
+      case '30days':
+        cutoffDate.setDate(today.getDate() - 29);
+        break;
+      case '90days':
+        cutoffDate.setDate(today.getDate() - 89);
+        break;
+      case 'all':
+      default:
+        cutoffDate = new Date(0);
+        break;
+    }
+
+    return Array.from(focusHistory.values())
+      .filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= cutoffDate && recordDate <= today;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  };
+
+  /**
+   * 为每日视图准备图表数据
+   * @returns 每日图表数据数组
+   */
+  const getDailyChartData = (): DailyChartDataPoint[] => {
+    const filtered = getFilteredHistory();
+
+    const daysMap = new Map<string, { duration: number; sessions: number }>();
+
+    filtered.forEach(record => {
+      const dateKey = record.date.substring(5);
+      daysMap.set(dateKey, {
+        duration: Math.round(record.totalDuration / 60),
+        sessions: record.sessionCount
+      });
+    });
+
+    return Array.from(daysMap.entries())
+      .map(([date, data]) => ({
+        date,
+        duration: data.duration,
+        sessions: data.sessions
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  };
+
+  /**
+   * 为每周视图准备图表数据
+   * @returns 每周图表数据数组
+   */
+  const getWeeklyChartData = (): WeeklyChartDataPoint[] => {
+    const filtered = getFilteredHistory();
+
+    const weeksMap = new Map<string, {
+      weekStart: string;
+      weekEnd: string;
+      totalDuration: number;
+      totalSessions: number;
+    }>();
+
+    filtered.forEach(record => {
+      const date = new Date(record.date);
+      const dayOfWeek = date.getDay();
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      const weekStartStr = weekStart.toISOString().substring(5, 10);
+      const weekEndStr = weekEnd.toISOString().substring(5, 10);
+      const weekKey = `${weekStartStr}-${weekEndStr}`;
+
+      if (weeksMap.has(weekKey)) {
+        const existing = weeksMap.get(weekKey)!;
+        weeksMap.set(weekKey, {
+          ...existing,
+          totalDuration: existing.totalDuration + record.totalDuration,
+          totalSessions: existing.totalSessions + record.sessionCount
+        });
+      } else {
+        weeksMap.set(weekKey, {
+          weekStart: weekStartStr,
+          weekEnd: weekEndStr,
+          totalDuration: record.totalDuration,
+          totalSessions: record.sessionCount
+        });
+      }
+    });
+
+    return Array.from(weeksMap.values())
+      .map(week => ({
+        week: `${week.weekStart}至${week.weekEnd}`,
+        duration: Math.round(week.totalDuration / 60),
+        sessions: week.totalSessions
+      }))
+      .sort((a, b) => a.week.localeCompare(b.week));
   };
 
 // 事件处理函数
@@ -1328,103 +1600,136 @@ const displayIsRunning = isRunningForMode[mode];
           </CardActions>
         </Card>
 
-        {/* 键盘快捷键提示 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                快捷键
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-              <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-              <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-            </Box>
-          </CardContent>
-        </Card>
+        {/* 快捷键、专注统计、运行状态横向排布 */}
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {/* 键盘快捷键提示 */}
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  快捷键
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="D 统计" size="small" sx={{ bgcolor: 'rgba(94,106,210,0.2)', color: modeColors.focus.primary, fontSize: '0.75rem', border: '1px solid rgba(94,106,210,0.3)', fontWeight: 500 }} />
+                <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+              </Box>
+            </CardContent>
+          </Card>
 
-        {/* 统计信息卡片 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                📊 专注统计
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Chip
-                label={`总时长: ${formatTotalFocusTime()}`}
-                size="small"
-                sx={{
-                  bgcolor: modeColors.focus.primary,
-                  color: '#ffffff',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  fontWeight: 500,
-                }}
-              />
-              <Chip
-                label={`专注次数: ${focusSessionCount}次`}
-                size="small"
-                sx={{
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-            </Box>
-          </CardContent>
-        </Card>
+          {/* 统计信息卡片 */}
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              bgcolor: 'rgba(255,255,255,0.03)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              flex: 1,
+              minWidth: { xs: '100%', sm: '200px' },
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, border-color 0.2s ease',
+              '&:hover': {
+                borderColor: 'rgba(255,255,255,0.12)',
+                transform: 'translateY(-2px)',
+              }
+            }}
+            onClick={() => setShowStatsDialog(true)}
+          >
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  📊 专注统计
+                </Typography>
+                <Chip
+                  label="详情"
+                  size="small"
+                  sx={{
+                    height: 20,
+                    fontSize: '0.7rem',
+                    bgcolor: 'rgba(94,106,210,0.2)',
+                    color: modeColors.focus.primary,
+                    border: '1px solid rgba(94,106,210,0.3)',
+                    fontWeight: 500,
+                  }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Chip
+                  label={`总时长: ${formatTotalFocusTime()}`}
+                  size="small"
+                  sx={{
+                    bgcolor: modeColors.focus.primary,
+                    color: '#ffffff',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    fontWeight: 500,
+                  }}
+                />
+                <Chip
+                  label={`专注次数: ${focusSessionCount}次`}
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
 
-        {/* 运行状态面板 */}
-        <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', mt: 2 }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                运行状态
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Chip
-                label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-              <Chip
-                label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-              <Chip
-                label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
-                size="small"
-                sx={{
-                  bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-            </Box>
-          </CardContent>
-        </Card>
+          {/* 运行状态面板 */}
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <CardContent sx={{ py: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                  运行状态
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Chip
+                  label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+                <Chip
+                  label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+                <Chip
+                  label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
+                  size="small"
+                  sx={{
+                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.9)',
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
       </Container>
 
       {/* 设置按钮 */}
@@ -1637,6 +1942,168 @@ const displayIsRunning = isRunningForMode[mode];
                   </Typography>
                 </CardContent>
               </Card>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {showStatsDialog && (
+        <Dialog
+          open={showStatsDialog}
+          onClose={() => setShowStatsDialog(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 4,
+              bgcolor: 'rgba(10,10,12,0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }
+          }}
+        >
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+              📈 专注趋势分析
+            </Typography>
+            <IconButton
+              onClick={() => setShowStatsDialog(false)}
+              size="small"
+              sx={{ color: 'text.secondary' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <Divider />
+
+          <DialogContent sx={{ pt: 2 }}>
+            {/* 控制面板 */}
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>
+              {/* 视图切换 */}
+              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2 }}>
+                <Button
+                  onClick={() => setChartViewMode('daily')}
+                  sx={{
+                    borderRadius: 2,
+                    bgcolor: chartViewMode === 'daily' ? modeColors.focus.primary : 'transparent',
+                    color: chartViewMode === 'daily' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    '&:hover': {
+                      bgcolor: chartViewMode === 'daily' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                    },
+                  }}
+                >
+                  每日视图
+                </Button>
+                <Button
+                  onClick={() => setChartViewMode('weekly')}
+                  sx={{
+                    borderRadius: 2,
+                    bgcolor: chartViewMode === 'weekly' ? modeColors.focus.primary : 'transparent',
+                    color: chartViewMode === 'weekly' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    '&:hover': {
+                      bgcolor: chartViewMode === 'weekly' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                    },
+                  }}
+                >
+                  每周视图
+                </Button>
+              </ButtonGroup>
+
+              {/* 时间范围选择 */}
+              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2 }}>
+                {(['7days', '30days', '90days', 'all'] as TimeRange[]).map((range) => (
+                  <Button
+                    key={range}
+                    onClick={() => setChartTimeRange(range)}
+                    sx={{
+                      borderRadius: 2,
+                      bgcolor: chartTimeRange === range ? modeColors.focus.primary : 'transparent',
+                      color: chartTimeRange === range ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                      fontSize: '0.8rem',
+                      '&:hover': {
+                        bgcolor: chartTimeRange === range ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      },
+                    }}
+                  >
+                    {range === '7days' ? '7天' : range === '30days' ? '30天' : range === '90days' ? '90天' : '全部'}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            </Box>
+
+            {/* 统计摘要卡片 */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+              <Card
+                variant="outlined"
+                sx={{
+                  flex: 1,
+                  borderRadius: 3,
+                  bgcolor: 'rgba(94,106,210,0.1)',
+                  borderColor: 'rgba(94,106,210,0.3)'
+                }}
+              >
+                <CardContent sx={{ py: 2, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    选定范围内总时长
+                  </Typography>
+                  <Typography variant="h5" color={modeColors.focus.primary} fontWeight={600}>
+                    {(() => {
+                      const totalSeconds = getFilteredHistory().reduce((sum, r) => sum + r.totalDuration, 0);
+                      const hours = (totalSeconds / 3600).toFixed(1);
+                      return parseFloat(hours) > 0 ? `${hours}小时` : '0小时';
+                    })()}
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              <Card
+                variant="outlined"
+                sx={{
+                  flex: 1,
+                  borderRadius: 3,
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  borderColor: 'rgba(255,255,255,0.06)'
+                }}
+              >
+                <CardContent sx={{ py: 2, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    选定范围内专注次数
+                  </Typography>
+                  <Typography variant="h5" fontWeight={600}>
+                    {getFilteredHistory().reduce((sum, r) => sum + r.sessionCount, 0)}次
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* 图表区域 */}
+            <Card
+              variant="outlined"
+              sx={{
+                borderRadius: 3,
+                bgcolor: 'rgba(255,255,255,0.02)',
+                borderColor: 'rgba(255,255,255,0.06)'
+              }}
+            >
+              <CardContent>
+                <Box sx={{ height: 300, width: '100%' }}>
+                  {chartViewMode === 'daily' ? (
+                    <DailyLineChart data={getDailyChartData()} />
+                  ) : (
+                    <WeeklyBarChart data={getWeeklyChartData()} />
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* 数据为空提示 */}
+            {getFilteredHistory().length === 0 && (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body2" color="text.secondary">
+                  暂无数据，开始你的第一次专注吧！
+                </Typography>
+              </Box>
             )}
           </DialogContent>
         </Dialog>

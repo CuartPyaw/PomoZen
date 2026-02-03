@@ -687,12 +687,6 @@ function App() {
   /**
    * 键盘快捷键监听
    * - Space/Enter: 开始/暂停
-   * - S: 跳过到下一个模式
-   * - R: 重置
-   * - D: 打开/关闭统计对话框
-   * - 1: 专注模式
-   * - 2: 短休息模式
-   * - 3: 长休息模式
    * - Esc: 关闭设置窗口/统计对话框
    */
   useEffect(() => {
@@ -725,35 +719,12 @@ function App() {
           e.preventDefault();
           handleStartPause();
           break;
-        case 's':
-        case 'S':
-          e.preventDefault();
-          handleSkip();
-          break;
-        case 'r':
-        case 'R':
-          handleReset();
-          break;
-        case 'd':
-        case 'D':
-          e.preventDefault();
-          setShowStatsDialog(prev => !prev);
-          break;
-        case '1':
-          handleManualModeToggle('focus');
-          break;
-        case '2':
-          handleManualModeToggle('break');
-          break;
-        case '3':
-          handleManualModeToggle('longBreak');
-          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [showSettings, showStatsDialog, isRunningForMode]);
+    }, [showSettings, showStatsDialog]);
 
 // 通知功能
 
@@ -1411,60 +1382,54 @@ const displayIsRunning = isRunningForMode[mode];
         {/* 模式切换按钮组 */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
           <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(255,255,255,0.06)' } }}>
-            <Tooltip title="快捷键: 1" arrow TransitionComponent={Zoom}>
-              <Button
-                onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
-                sx={{
-                  minWidth: 100,
-                  borderRadius: 2,
-                  bgcolor: mode === 'focus' ? themeColor.primary : 'transparent',
-                  color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.6)',
-                  borderColor: mode === 'focus' ? 'transparent' : 'rgba(255,255,255,0.06)',
-                  '&:hover': {
-                    bgcolor: mode === 'focus' ? themeColor.bright : 'rgba(255,255,255,0.05)',
-                    color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                  },
-                }}
-              >
-                专注
-              </Button>
-            </Tooltip>
-            <Tooltip title="快捷键: 2" arrow TransitionComponent={Zoom}>
-              <Button
-                onClick={() => mode !== 'break' && handleManualModeToggle('break')}
-                sx={{
-                  minWidth: 100,
-                  borderRadius: 2,
-                  bgcolor: mode === 'break' ? modeColors.break.primary : 'transparent',
-                  color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.6)',
-                  borderColor: mode === 'break' ? 'transparent' : 'rgba(255,255,255,0.06)',
-                  '&:hover': {
-                    bgcolor: mode === 'break' ? modeColors.break.bright : 'rgba(255,255,255,0.05)',
-                    color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                  },
-                }}
-              >
-                短休息
-              </Button>
-            </Tooltip>
-            <Tooltip title="快捷键: 3" arrow TransitionComponent={Zoom}>
-              <Button
-                onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
-                sx={{
-                  minWidth: 100,
-                  borderRadius: 2,
-                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'transparent',
-                  color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.6)',
-                  borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(255,255,255,0.06)',
-                  '&:hover': {
-                    bgcolor: mode === 'longBreak' ? modeColors.longBreak.bright : 'rgba(255,255,255,0.05)',
-                    color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                  },
-                }}
-              >
-                长休息
-              </Button>
-            </Tooltip>
+            <Button
+              onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
+              sx={{
+                minWidth: 100,
+                borderRadius: 2,
+                bgcolor: mode === 'focus' ? themeColor.primary : 'transparent',
+                color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                borderColor: mode === 'focus' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                '&:hover': {
+                  bgcolor: mode === 'focus' ? themeColor.bright : 'rgba(255,255,255,0.05)',
+                  color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                },
+              }}
+            >
+              专注
+            </Button>
+            <Button
+              onClick={() => mode !== 'break' && handleManualModeToggle('break')}
+              sx={{
+                minWidth: 100,
+                borderRadius: 2,
+                bgcolor: mode === 'break' ? modeColors.break.primary : 'transparent',
+                color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                borderColor: mode === 'break' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                '&:hover': {
+                  bgcolor: mode === 'break' ? modeColors.break.bright : 'rgba(255,255,255,0.05)',
+                  color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                },
+              }}
+            >
+              短休息
+            </Button>
+            <Button
+              onClick={() => mode !== 'longBreak' && handleManualModeToggle('longBreak')}
+              sx={{
+                minWidth: 100,
+                borderRadius: 2,
+                bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'transparent',
+                color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                '&:hover': {
+                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.bright : 'rgba(255,255,255,0.05)',
+                  color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                },
+              }}
+            >
+              长休息
+            </Button>
           </ButtonGroup>
         </Box>
 
@@ -1561,7 +1526,7 @@ const displayIsRunning = isRunningForMode[mode];
                 {displayIsRunning ? '暂停' : '开始'}
               </Button>
             </Tooltip>
-            <Tooltip title="跳过 (S)" arrow TransitionComponent={Zoom}>
+            <Tooltip title="跳过" arrow TransitionComponent={Zoom}>
               <Button
                 variant="outlined"
                 size="large"
@@ -1579,7 +1544,7 @@ const displayIsRunning = isRunningForMode[mode];
                 跳过
               </Button>
             </Tooltip>
-            <Tooltip title="重置 (R)" arrow TransitionComponent={Zoom}>
+            <Tooltip title="重置" arrow TransitionComponent={Zoom}>
               <Button
                 variant="outlined"
                 size="large"
@@ -1611,14 +1576,8 @@ const displayIsRunning = isRunningForMode[mode];
                   快捷键
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="S 跳过" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="R 重置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="D 统计" size="small" sx={{ bgcolor: 'rgba(94,106,210,0.2)', color: modeColors.focus.primary, fontSize: '0.75rem', border: '1px solid rgba(94,106,210,0.3)', fontWeight: 500 }} />
-                <Chip label="1 专注" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="2 短休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="3 长休息" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
                 <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               </Box>
             </CardContent>

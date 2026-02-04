@@ -39,11 +39,10 @@ export const DailyLineChart: React.FC<{ data: DailyChartDataPoint[] }> = ({ data
         />
         <Tooltip
           contentStyle={{
-            bgcolor: 'rgba(10,10,12,0.95)',
+            backgroundColor: 'rgba(10,10,12,0.95)',
             border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 8,
             color: '#ffffff',
-            backgroundColor: 'rgba(10,10,12,0.95)',
           }}
           itemStyle={{ color: '#ffffff' }}
           labelStyle={{ color: 'rgba(255,255,255,0.8)' }}
@@ -96,11 +95,10 @@ export const WeeklyBarChart: React.FC<{ data: WeeklyChartDataPoint[] }> = ({ dat
         />
         <Tooltip
           contentStyle={{
-            bgcolor: 'rgba(10,10,12,0.95)',
+            backgroundColor: 'rgba(10,10,12,0.95)',
             border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 8,
             color: '#ffffff',
-            backgroundColor: 'rgba(10,10,12,0.95)',
           }}
           itemStyle={{ color: '#ffffff' }}
           labelStyle={{ color: 'rgba(255,255,255,0.8)' }}

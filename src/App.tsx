@@ -773,37 +773,37 @@ function App() {
    */
   const handleTimerComplete = (completedMode: TimerMode) => {
     console.log('=== handleTimerComplete called ===', { completedMode, currentMode: currentModeRef.current, autoSwitch, pomodoroCycle });
+
+    // 专注模式完成时，累计专注时长和次数
+    if (completedMode === 'focus') {
+      const completedTime = getFocusTime();
+      setTotalFocusTime((prev) => prev + completedTime);
+      setFocusSessionCount((prev) => prev + 1);
+      updateTodayFocusRecord(completedTime);
+      sendNotification('专注结束', '时间到了！该休息一下了');
+    } else if (completedMode === 'break') {
+      sendNotification('休息结束', '休息完成！开始专注吧');
+    } else if (completedMode === 'longBreak') {
+      sendNotification('长休息结束', '休息完成！开始新的番茄钟周期');
+    }
+
+    // 如果启用自动切换，只在当前显示的模式完成时才执行切换
+    if (!autoSwitch) {
+      console.log('⚠ Auto switch disabled, skipping mode switch');
+      return;
+    }
+
+    if (completedMode !== currentModeRef.current) {
+      // 非当前模式完成，只发送通知和更新状态，不切换
+      console.log('⚠ Non-current mode completed, skipping auto-switch');
+      return;
+    }
+
+    // 设置保护标志，防止重复触发
     setCompletionGuard((prev) => {
       if (prev) {
         console.log('⚠ Completion guard already active, skipping');
         return prev;
-      }
-
-      // 专注模式完成时，累计专注时长和次数
-      if (completedMode === 'focus') {
-        const completedTime = getFocusTime();
-        setTotalFocusTime((prev) => prev + completedTime);
-        setFocusSessionCount((prev) => prev + 1);
-        updateTodayFocusRecord(completedTime);
-        sendNotification('专注结束', '时间到了！该休息一下了');
-      } else if (completedMode === 'break') {
-        sendNotification('休息结束', '休息完成！开始专注吧');
-      } else if (completedMode === 'longBreak') {
-        sendNotification('长休息结束', '休息完成！开始新的番茄钟周期');
-      }
-
-      // 如果启用自动切换，只在当前显示的模式完成时才执行切换
-      if (autoSwitch) {
-        console.log('✓ Auto switch enabled, checking if completed mode is current', { completedMode, currentMode: currentModeRef.current });
-        if (completedMode !== currentModeRef.current) {
-          // 非当前模式完成，只发送通知和更新状态，不切换
-          console.log('⚠ Non-current mode completed, skipping auto-switch');
-          return true;
-        }
-      } else {
-        // 未启用自动切换，直接返回
-        console.log('⚠ Auto switch disabled, skipping mode switch');
-        return true;
       }
 
       let nextMode: TimerMode;
@@ -1296,8 +1296,7 @@ function App() {
       switchTimeoutRef.current = null;
     }
 
-    // 重置周期和保护标志
-    setPomodoroCycle(1);
+    // 重置保护标志（不重置周期计数，让用户可以继续累积周期）
     setCompletionGuard(false);
 
     // 获取新模式完整时间

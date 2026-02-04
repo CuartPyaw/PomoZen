@@ -1386,6 +1386,55 @@ function App() {
     }
   };
 
+  /**
+   * 清除所有缓存
+   * 清除所有 localStorage 中的番茄钟数据，并重置为默认状态
+   */
+  const handleClearCache = () => {
+    if (window.confirm('确定要清除所有缓存吗？这将删除所有设置、统计数据和历史记录，此操作不可撤销。')) {
+      try {
+        // 清除所有 tomato- 开头的 localStorage 项
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('tomato-')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+
+        // 重置所有状态为默认值
+        setCustomFocusTime(DEFAULT_FOCUS_TIME);
+        setCustomBreakTime(DEFAULT_BREAK_TIME);
+        setCustomLongBreakTime(DEFAULT_LONG_BREAK_TIME);
+        setAutoSwitch(true);
+        setAutoStart(true);
+        setTotalFocusTime(0);
+        setFocusSessionCount(0);
+        setFocusHistory(new Map());
+        setPomodoroCycle(1);
+        setMode('focus');
+
+        // 重置时间状态
+        setTimeLeftForMode({
+          focus: DEFAULT_FOCUS_TIME,
+          break: DEFAULT_BREAK_TIME,
+          longBreak: DEFAULT_LONG_BREAK_TIME
+        });
+        setIsRunningForMode({
+          focus: false,
+          break: false,
+          longBreak: false
+        });
+
+        sendNotification('缓存已清除', '所有数据已重置为默认状态');
+        console.log('✓ All cache cleared successfully');
+      } catch (error) {
+        console.error('Failed to clear cache:', error);
+      }
+    }
+  };
+
 // JSX 渲染
 
 const displayTime = timeLeftForMode[mode];
@@ -1916,6 +1965,28 @@ const displayIsRunning = isRunningForMode[mode];
                 </CardContent>
               </Card>
             )}
+
+            {/* 清除缓存部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              🗑️ 数据管理
+            </Typography>
+
+            <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: 'action.hover' }}>
+              <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  清除所有本地缓存数据，包括设置、统计记录和历史数据
+                </Typography>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  onClick={handleClearCache}
+                  sx={{ borderRadius: 3, borderColor: 'error.main', color: 'error.main', '&:hover': { bgcolor: 'error.main', color: '#ffffff' } }}
+                >
+                  清除所有缓存
+                </Button>
+              </CardContent>
+            </Card>
           </DialogContent>
         </Dialog>
       )}

@@ -372,11 +372,18 @@ function App() {
   const currentModeRef = useRef<TimerMode>('focus');
 
   /**
-   * 同步更新 currentModeRef
+   * 周期计数引用
+   * 用于在闭包中获取最新的周期值
+   */
+  const pomodoroCycleRef = useRef(pomodoroCycle);
+
+  /**
+   * 同步更新 currentModeRef 和 pomodoroCycleRef
    */
   useEffect(() => {
     currentModeRef.current = mode;
-  }, [mode]);
+    pomodoroCycleRef.current = pomodoroCycle;
+  }, [mode, pomodoroCycle]);
 
   /**
    * 初始化计时器 Worker
@@ -811,9 +818,12 @@ function App() {
       if (completedMode === 'focus') {
         nextMode = 'break';
       } else if (completedMode === 'break') {
-        if (pomodoroCycle >= POMODORO_CYCLE_COUNT) {
+        console.log('🔢 Current cycle before decision:', pomodoroCycleRef.current);
+        if (pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT) {
+          console.log('✓ Cycle count reached, going to long break');
           nextMode = 'longBreak';
         } else {
+          console.log(`→ Cycle ${pomodoroCycleRef.current}/${POMODORO_CYCLE_COUNT}, continuing to focus`);
           nextMode = 'focus';
         }
       } else {
@@ -821,9 +831,15 @@ function App() {
       }
 
       if (completedMode === 'longBreak') {
+        console.log('🔄 Long break completed, resetting cycle to 1');
         setPomodoroCycle(1);
       } else if (completedMode === 'break') {
-        setPomodoroCycle(pomodoroCycle + 1);
+        console.log(`📈 Incrementing cycle: current = ${pomodoroCycleRef.current} → new = ${pomodoroCycleRef.current + 1}`);
+        // 使用函数式更新确保获取最新的周期值
+        setPomodoroCycle((prev) => {
+          console.log(`✅ Cycle updated: ${prev} → ${prev + 1}`);
+          return prev + 1;
+        });
       }
 
       // 先设置新模式的完整时间，再切换
@@ -1242,7 +1258,8 @@ function App() {
     if (mode === 'longBreak') {
       setPomodoroCycle(1);
     } else if (mode === 'break') {
-      setPomodoroCycle(pomodoroCycle + 1);
+      // 使用函数式更新确保获取最新的周期值
+      setPomodoroCycle((prev) => prev + 1);
     }
 
     const initialTime =

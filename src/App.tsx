@@ -1033,9 +1033,9 @@ function App() {
    */
   const getFilteredHistory = (): DailyFocusRecord[] => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayString = today.toISOString().substring(0, 10);  // YYYY-MM-DD (UTC)
 
-    let cutoffDate = new Date(today);
+    let cutoffDate = new Date();
 
     switch (chartTimeRange) {
       case '7days':
@@ -1053,10 +1053,12 @@ function App() {
         break;
     }
 
+    const cutoffString = cutoffDate.toISOString().substring(0, 10);  // YYYY-MM-DD (UTC)
+
     return Array.from(focusHistory.values())
       .filter(record => {
-        const recordDate = new Date(record.date);
-        return recordDate >= cutoffDate && recordDate <= today;
+        // 使用字符串比较，避免时区问题
+        return record.date >= cutoffString && record.date <= todayString;
       })
       .sort((a, b) => a.date.localeCompare(b.date));
   };

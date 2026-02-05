@@ -2138,8 +2138,8 @@ const displayIsRunning = isRunningForMode[mode];
                   <Typography variant="h5" color={modeColors.focus.primary} fontWeight={600}>
                     {(() => {
                       const totalSeconds = getFilteredHistory().reduce((sum, r) => sum + r.totalDuration, 0);
-                      const hours = (totalSeconds / 3600).toFixed(1);
-                      return parseFloat(hours) > 0 ? `${hours}小时` : '0小时';
+                      const minutes = Math.floor(totalSeconds / 60);
+                      return `${minutes}分钟`;
                     })()}
                   </Typography>
                 </CardContent>

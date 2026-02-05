@@ -77,7 +77,7 @@ tomato-clock/
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/tomato-clock.git
+git clone https://github.com/CuartPyaw/tomato-clock.git
 cd tomato-clock
 
 # 安装依赖
@@ -109,7 +109,7 @@ npm run preview
 
 ### 选项 1：Vercel（推荐）
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/tomato-clock)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/tomato-clock)
 
 #### 使用 Vercel CLI
 

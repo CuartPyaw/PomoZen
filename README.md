@@ -77,7 +77,7 @@ tomato-clock/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/tomato-clock.git
+git clone https://github.com/CuartPyaw/tomato-clock.git
 cd tomato-clock
 
 # Install dependencies
@@ -109,7 +109,7 @@ npm run preview
 
 ### Option 1: Vercel (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/tomato-clock)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/tomato-clock)
 
 #### Using Vercel CLI
 

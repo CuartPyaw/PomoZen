@@ -18,12 +18,19 @@ export interface DailyFocusRecord {
     startTime: number;  // 时间戳
     duration: number;   // 时长（秒）
   }>;
+  /** 24小时分布，每个下标代表一小时，值为该小时的专注总时长（秒） */
+  hourlyDistribution?: number[];
 }
 
 /**
  * 图表视图模式
  */
-export type ChartViewMode = 'daily' | 'weekly';
+export type ChartViewMode = 'daily' | 'weekly' | 'monthly';
+
+/**
+ * 数据指标类型
+ */
+export type DataMetric = 'duration' | 'count' | 'average';
 
 /**
  * 时间范围选项
@@ -52,6 +59,32 @@ export interface WeeklyChartDataPoint {
   duration: number;
   /** 专注次数 */
   sessions: number;
+}
+
+/**
+ * 每月图表数据点
+ */
+export interface MonthlyChartDataPoint {
+  /** 月份（YYYY-MM 格式） */
+  month: string;
+  /** 专注时长（分钟） */
+  duration: number;
+  /** 专注次数 */
+  sessions: number;
+  /** 平均时长（分钟） */
+  average: number;
+}
+
+/**
+ * 时段分布数据点
+ */
+export interface TimeDistributionDataPoint {
+  /** 小时（0-23） */
+  hour: number;
+  /** 专注总时长（分钟） */
+  duration: number;
+  /** 专注次数 */
+  count: number;
 }
 
 /**

@@ -1981,9 +1981,10 @@ const displayIsRunning = isRunningForMode[mode];
           PaperProps={{
             sx: {
               borderRadius: 4,
-              bgcolor: 'rgba(10,10,12,0.95)',
+              bgcolor: 'background.paper',
               backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: '1px solid',
+              borderColor: 'divider',
             }
           }}
         >
@@ -2123,8 +2124,8 @@ const displayIsRunning = isRunningForMode[mode];
                 sx={{
                   flex: 1,
                   borderRadius: 3,
-                  bgcolor: 'rgba(94,106,210,0.1)',
-                  borderColor: 'rgba(94,106,210,0.3)'
+                  bgcolor: 'rgba(122,145,141,0.08)',
+                  borderColor: 'rgba(122,145,141,0.25)'
                 }}
               >
                 <CardContent sx={{ py: 2, textAlign: 'center' }}>
@@ -2146,15 +2147,15 @@ const displayIsRunning = isRunningForMode[mode];
                 sx={{
                   flex: 1,
                   borderRadius: 3,
-                  bgcolor: 'rgba(255,255,255,0.03)',
-                  borderColor: 'rgba(255,255,255,0.06)'
+                  bgcolor: 'rgba(44,44,44,0.03)',
+                  borderColor: 'rgba(44,44,44,0.08)'
                 }}
               >
                 <CardContent sx={{ py: 2, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     选定范围内专注次数
                   </Typography>
-                  <Typography variant="h5" fontWeight={600}>
+                  <Typography variant="h5" fontWeight={600} sx={{ color: '#7A8B8B' }}>
                     {getFilteredHistory().reduce((sum, r) => sum + r.sessionCount, 0)}次
                   </Typography>
                 </CardContent>
@@ -2195,7 +2196,7 @@ const displayIsRunning = isRunningForMode[mode];
               }}
             >
               <CardContent>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#7A8B8B' }}>
                   🕐 时段分布（24小时）
                 </Typography>
                 <TimeDistributionHeatmap
@@ -2246,9 +2247,10 @@ const displayIsRunning = isRunningForMode[mode];
         PaperProps={{
           sx: {
             borderRadius: 4,
-            bgcolor: 'rgba(10,10,12,0.95)',
+            bgcolor: 'background.paper',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid',
+            borderColor: 'divider',
           }
         }}
       >

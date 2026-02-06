@@ -1846,7 +1846,7 @@ const displayIsRunning = isRunningForMode[mode];
           }}
         >
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
-            <Typography variant="h6" component="div">
+            <Typography variant="h6" component="div" sx={{ color: '#7A918D', flex: 1, textAlign: 'center' }}>
               设置
             </Typography>
             <IconButton

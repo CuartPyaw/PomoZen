@@ -1703,14 +1703,14 @@ const displayIsRunning = isRunningForMode[mode];
           <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <KeyboardIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                <KeyboardIcon sx={{ color: '#2C2C2C', fontSize: 18 }} />
+                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
                   快捷键
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
               </Box>
             </CardContent>
           </Card>
@@ -1737,7 +1737,7 @@ const displayIsRunning = isRunningForMode[mode];
             <CardContent sx={{ py: 2 }}>
               {/* 第一行：标题居中 */}
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
                   📊 专注统计
                 </Typography>
               </Box>
@@ -1776,7 +1776,7 @@ const displayIsRunning = isRunningForMode[mode];
           <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
                   运行状态
                 </Typography>
               </Box>
@@ -1786,7 +1786,7 @@ const displayIsRunning = isRunningForMode[mode];
                   size="small"
                   sx={{
                     bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
-                    color: 'rgba(255,255,255,0.9)',
+                    color: isRunningForMode.focus ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
                     border: '1px solid rgba(255,255,255,0.06)',
                   }}
@@ -1796,7 +1796,7 @@ const displayIsRunning = isRunningForMode[mode];
                   size="small"
                   sx={{
                     bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
-                    color: 'rgba(255,255,255,0.9)',
+                    color: isRunningForMode.break ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
                     border: '1px solid rgba(255,255,255,0.06)',
                   }}
@@ -1806,7 +1806,7 @@ const displayIsRunning = isRunningForMode[mode];
                   size="small"
                   sx={{
                     bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
-                    color: 'rgba(255,255,255,0.9)',
+                    color: isRunningForMode.longBreak ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
                     border: '1px solid rgba(255,255,255,0.06)',
                   }}

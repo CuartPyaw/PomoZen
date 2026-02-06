@@ -81,7 +81,7 @@ git clone https://github.com/CuartPyaw/tomato-clock.git
 cd tomato-clock
 
 # Install dependencies
-npm ci
+npm install
 ```
 
 ### Development
@@ -105,7 +105,7 @@ npm run preview
 
 ---
 
-## Deployment
+## 部署
 
 ### Option 1: Vercel (Recommended)
 

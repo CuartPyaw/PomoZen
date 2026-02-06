@@ -1,8 +1,8 @@
-# 番茄钟
+# PomoZen
 
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md)
 
-> 一个具有 Linear 风格设计美学的现代番茄钟应用。
+> 一个具有 Linear 风格设计美学的现代番茄钟应用（Pomodoro Zen）。
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![React](https://img.shields.io/badge/React-18.3.1-cyan)

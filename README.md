@@ -1,6 +1,6 @@
 # PomoZen
 
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md)
+[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md) [![Changelog](https://img.shields.io/badge/changelog-更新记录-green.svg)](CHANGELOG.md)
 
 > A modern Pomodoro timer application with Linear-inspired design aesthetic.
 

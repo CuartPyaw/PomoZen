@@ -11,14 +11,14 @@
 ### 方法1：使用默认镜像名称
 
 ```bash
-docker build -t tomato-clock .
+docker build -t pomozen .
 ```
 
 ### 方法2：指定镜像名称和标签
 
 ```bash
-docker build -t tomato-clock:latest .
-docker build -t tomato-clock:v1.0.0 .
+docker build -t pomozen:latest .
+docker build -t pomozen:v1.0.0 .
 ```
 
 ### 方法3：使用Docker Compose（推荐）
@@ -29,12 +29,12 @@ docker build -t tomato-clock:v1.0.0 .
 version: '3.8'
 
 services:
-  tomato-clock:
+  pomozen:
     build: .
     ports:
       - "8080:80"
     restart: unless-stopped
-    container_name: tomato-clock
+    container_name: pomozen
 ```
 
 然后运行：
@@ -48,19 +48,19 @@ docker-compose up -d
 ### 基础运行
 
 ```bash
-docker run -d -p 8080:80 --name tomato-clock tomato-clock
+docker run -d -p 8080:80 --name pomozen pomozen
 ```
 
 ### 指定端口
 
 ```bash
-docker run -d -p 3000:80 --name tomato-clock tomato-clock
+docker run -d -p 3000:80 --name pomozen pomozen
 ```
 
 ### 自定义重启策略
 
 ```bash
-docker run -d -p 8080:80 --restart unless-stopped --name tomato-clock tomato-clock
+docker run -d -p 8080:80 --restart unless-stopped --name pomozen pomozen
 ```
 
 ## 容器管理
@@ -74,39 +74,39 @@ docker ps
 ### 查看日志
 
 ```bash
-docker logs tomato-clock
-docker logs -f tomato-clock  # 实时查看
+docker logs pomozen
+docker logs -f pomozen  # 实时查看
 ```
 
 ### 停止容器
 
 ```bash
-docker stop tomato-clock
+docker stop pomozen
 ```
 
 ### 启动已停止的容器
 
 ```bash
-docker start tomato-clock
+docker start pomozen
 ```
 
 ### 重启容器
 
 ```bash
-docker restart tomato-clock
+docker restart pomozen
 ```
 
 ### 删除容器
 
 ```bash
-docker rm tomato-clock  # 需先停止
-docker rm -f tomato-clock  # 强制删除
+docker rm pomozen  # 需先停止
+docker rm -f pomozen  # 强制删除
 ```
 
 ### 删除镜像
 
 ```bash
-docker rmi tomato-clock
+docker rmi pomozen
 ```
 
 ## 使用Docker Compose
@@ -155,7 +155,7 @@ ENV API_URL=http://your-api-url
 然后运行时指定：
 
 ```bash
-docker run -d -p 8080:80 -e API_URL=http://your-api-url tomato-clock
+docker run -d -p 8080:80 -e API_URL=http://your-api-url pomozen
 ```
 
 ## 生产部署建议
@@ -172,12 +172,12 @@ docker run -d -p 8080:80 -e API_URL=http://your-api-url tomato-clock
 
 ```yaml
 services:
-  tomato-clock:
+  pomozen:
     build: .
     ports:
       - "8080:80"
     restart: unless-stopped
-    container_name: tomato-clock
+    container_name: pomozen
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
@@ -190,7 +190,7 @@ services:
 ### 容器无法启动
 
 ```bash
-docker logs tomato-clock
+docker logs pomozen
 ```
 
 ### 端口被占用
@@ -198,7 +198,7 @@ docker logs tomato-clock
 修改端口映射，使用其他端口：
 
 ```bash
-docker run -d -p 8081:80 --name tomato-clock tomato-clock
+docker run -d -p 8081:80 --name pomozen pomozen
 ```
 
 ### 构建失败
@@ -206,5 +206,5 @@ docker run -d -p 8081:80 --name tomato-clock tomato-clock
 检查依赖是否完整：
 
 ```bash
-docker build --no-cache -t tomato-clock .
+docker build --no-cache -t pomozen .
 ```

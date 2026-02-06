@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  tomato-clock:
+  pomozen:
     build: .
     ports:
       - "8080:80"
     restart: unless-stopped
-    container_name: tomato-clock
+    container_name: pomozen
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s

@@ -40,7 +40,7 @@
 ## Project Structure
 
 ```
-tomato-clock/
+pomozen/
 ├── src/
 │   ├── components/
 │   │   └── Charts/                 # Statistics chart components
@@ -77,8 +77,8 @@ tomato-clock/
 
 ```bash
 # Clone the repository
-git clone https://github.com/CuartPyaw/tomato-clock.git
-cd tomato-clock
+git clone https://github.com/CuartPyaw/pomozen.git
+cd pomozen
 
 # Install dependencies
 npm install
@@ -109,7 +109,7 @@ npm run preview
 
 ### Option 1: Vercel (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/tomato-clock)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/pomozen)
 
 #### Using Vercel CLI
 
@@ -175,10 +175,10 @@ docker-compose down
 
 ```bash
 # Build the image
-docker build -t tomato-clock .
+docker build -t pomozen .
 
 # Run the container
-docker run -d -p 8080:80 --name tomato-clock tomato-clock
+docker run -d -p 8080:80 --name pomozen pomozen
 ```
 
 Visit `http://localhost:8080` after container starts.

@@ -40,7 +40,7 @@
 ## 项目结构
 
 ```
-tomato-clock/
+pomozen/
 ├── src/
 │   ├── components/
 │   │   └── Charts/                 # 统计图表组件
@@ -77,8 +77,8 @@ tomato-clock/
 
 ```bash
 # 克隆仓库
-git clone https://github.com/CuartPyaw/tomato-clock.git
-cd tomato-clock
+git clone https://github.com/CuartPyaw/pomozen.git
+cd pomozen
 
 # 安装依赖
 npm ci
@@ -109,7 +109,7 @@ npm run preview
 
 ### 选项 1：Vercel（推荐）
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/tomato-clock)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/pomozen)
 
 #### 使用 Vercel CLI
 
@@ -175,10 +175,10 @@ docker-compose down
 
 ```bash
 # 构建镜像
-docker build -t tomato-clock .
+docker build -t pomozen .
 
 # 运行容器
-docker run -d -p 8080:80 --name tomato-clock tomato-clock
+docker run -d -p 8080:80 --name pomozen pomozen
 ```
 
 容器启动后访问 `http://localhost:8080`。

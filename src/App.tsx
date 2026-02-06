@@ -1759,9 +1759,9 @@ const displayIsRunning = isRunningForMode[mode];
                   sx={{
                     height: 28,
                     fontSize: '0.8rem',
-                    bgcolor: 'rgba(94,106,210,0.2)',
-                    color: modeColors.focus.primary,
-                    border: '1px solid rgba(94,106,210,0.3)',
+                    bgcolor: 'primary.main',
+                    color: '#ffffff',
+                    border: 'none',
                     fontWeight: 500,
                   }}
                 />

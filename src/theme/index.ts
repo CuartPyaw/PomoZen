@@ -158,6 +158,7 @@ export const createZenTheme = () => createTheme({
     `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
     `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
     `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
   ],
   components: {
     MuiCard: {

@@ -1523,9 +1523,15 @@ const displayIsRunning = isRunningForMode[mode];
                 color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.6)',
                 borderColor: mode === 'focus' ? 'transparent' : 'rgba(255,255,255,0.06)',
                 '&:hover': {
-                  bgcolor: mode === 'focus' ? themeColor.bright : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'focus' ? themeColor.primary : 'rgba(255,255,255,0.05)',
                   color: mode === 'focus' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  ...(mode === 'focus' && {
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.15)',
+                  }),
                 },
+                ...(mode === 'focus' && {
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                }),
               }}
             >
               专注
@@ -1539,9 +1545,15 @@ const displayIsRunning = isRunningForMode[mode];
                 color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.6)',
                 borderColor: mode === 'break' ? 'transparent' : 'rgba(255,255,255,0.06)',
                 '&:hover': {
-                  bgcolor: mode === 'break' ? modeColors.break.bright : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'break' ? modeColors.break.primary : 'rgba(255,255,255,0.05)',
                   color: mode === 'break' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  ...(mode === 'break' && {
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.15)',
+                  }),
                 },
+                ...(mode === 'break' && {
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                }),
               }}
             >
               短休息
@@ -1555,9 +1567,15 @@ const displayIsRunning = isRunningForMode[mode];
                 color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.6)',
                 borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(255,255,255,0.06)',
                 '&:hover': {
-                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.bright : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'rgba(255,255,255,0.05)',
                   color: mode === 'longBreak' ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                  ...(mode === 'longBreak' && {
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.15)',
+                  }),
                 },
+                ...(mode === 'longBreak' && {
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                }),
               }}
             >
               长休息

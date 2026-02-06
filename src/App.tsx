@@ -44,7 +44,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createDarkTheme } from './theme';
+import { createZenTheme } from './theme';
 import type {
   DailyFocusRecord,
   ChartViewMode,
@@ -1473,15 +1473,15 @@ const displayIsRunning = isRunningForMode[mode];
   const { radius, circumference, offset } = getProgressParams();
 
   const modeColors = {
-    focus: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
-    break: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
-    longBreak: { primary: '#5E6AD2', bright: '#6872D9', glow: 'rgba(94,106,210,0.3)' },
+    focus: { primary: '#7A918D', bright: '#8FA398', glow: 'rgba(122,145,141,0.3)' },
+    break: { primary: '#C4A77D', bright: '#D4B896', glow: 'rgba(196,167,125,0.3)' },
+    longBreak: { primary: '#7A8B8B', bright: '#8B9D9D', glow: 'rgba(122,139,139,0.3)' },
   };
 
   const themeColor = modeColors[mode];
 
   return (
-    <ThemeProvider theme={createDarkTheme()}>
+    <ThemeProvider theme={createZenTheme()}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* 背景系统 */}

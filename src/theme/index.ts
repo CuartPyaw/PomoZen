@@ -1,8 +1,9 @@
 /**
- * Linear/Modern 设计系统主题配置
+ * 中国禅意设计系统主题配置
  *
- * 基于 MUI Theme，扩展为 Linear 风格的设计令牌
- * 包含：深空色板、排版系统、阴影系统、动画系统
+ * 基于 MUI Theme，扩展为禅意风格的设计令牌
+ * 配色方案：竹林清风
+ * 包含：宣纸色板、排版系统、阴影系统、动画系统
  *
  * @module theme
  */
@@ -10,33 +11,33 @@
 import { createTheme } from '@mui/material/styles';
 
 /**
- * 设计令牌 - 颜色系统
+ * 设计令牌 - 颜色系统（竹林清风配色）
  */
 const designTokens = {
   colors: {
     background: {
-      deep: '#020203',
-      base: '#050506',
-      elevated: '#0a0a0c',
+      deep: '#E0D9CD',      // 深宣纸色
+      base: '#F0ECE5',      // 宣纸白基础
+      elevated: '#F5F2EB',  // 宣纸白悬浮
     },
     surface: {
-      default: 'rgba(255,255,255,0.05)',
-      hover: 'rgba(255,255,255,0.08)',
+      default: 'rgba(44,44,44,0.04)',     // 淡墨表面
+      hover: 'rgba(44,44,44,0.08)',        // 悬停淡墨
     },
     foreground: {
-      primary: '#EDEDEF',
-      muted: '#8A8F98',
-      subtle: 'rgba(255,255,255,0.60)',
+      primary: '#2C2C2C',     // 墨黑
+      muted: '#6A6A6A',       // 淡墨
+      subtle: 'rgba(44,44,44,0.55)',  // 细腻墨色
     },
     accent: {
-      primary: '#5E6AD2',
-      bright: '#6872D9',
-      glow: 'rgba(94,106,210,0.30)',
+      primary: '#7A918D',     // 竹青
+      bright: '#8FA398',      // 竹青亮
+      glow: 'rgba(122,145,141,0.30)',  // 竹青辉光
     },
     border: {
-      default: 'rgba(255,255,255,0.06)',
-      hover: 'rgba(255,255,255,0.10)',
-      accent: 'rgba(94,106,210,0.30)',
+      default: 'rgba(44,44,44,0.08)',   // 淡墨边框
+      hover: 'rgba(44,44,44,0.12)',     // 悬停边框
+      accent: 'rgba(122,145,141,0.30)', // 竹青边框
     },
   },
   typography: {
@@ -73,11 +74,11 @@ const designTokens = {
 };
 
 /**
- * 创建暗色主题（默认）
+ * 创建禅意主题（默认）
  */
-export const createDarkTheme = () => createTheme({
+export const createZenTheme = () => createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     background: {
       default: designTokens.colors.background.base,
       paper: designTokens.colors.background.elevated,
@@ -134,37 +135,35 @@ export const createDarkTheme = () => createTheme({
   },
   shadows: [
     'none',
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.hover}, 0 8px 40px rgba(0,0,0,0.5), 0 0 80px ${designTokens.colors.accent.glow}`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
-    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.hover}, 0 4px 12px rgba(44,44,44,0.12), 0 12px 24px ${designTokens.colors.accent.glow}`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
+    `0 0 0 1px ${designTokens.colors.border.default}, 0 2px 8px rgba(44,44,44,0.08), 0 8px 16px rgba(44,44,44,0.04)`,
   ],
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
-          backdropFilter: 'blur(20px)',
+          background: designTokens.colors.background.elevated,
           border: `1px solid ${designTokens.colors.border.default}`,
           borderRadius: designTokens.radius.lg,
           '&::before': {
@@ -174,7 +173,7 @@ export const createDarkTheme = () => createTheme({
             left: 0,
             right: 0,
             height: '1px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.1), transparent)',
+            background: 'linear-gradient(to bottom, rgba(44,44,44,0.08), transparent)',
             borderRadius: `${designTokens.radius.lg}px ${designTokens.radius.lg}px 0 0`,
           },
           '&:hover': {
@@ -208,10 +207,10 @@ export const createDarkTheme = () => createTheme({
           background: designTokens.colors.surface.default,
           color: designTokens.colors.foreground.primary,
           border: 'none',
-          boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.1)`,
+          boxShadow: `inset 0 1px 0 0 rgba(44,44,44,0.05)`,
           '&:hover': {
             background: designTokens.colors.surface.hover,
-            boxShadow: `0 0 0 1px ${designTokens.colors.border.hover}, 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 0 rgba(255,255,255,0.1)`,
+            boxShadow: `0 0 0 1px ${designTokens.colors.border.hover}, 0 2px 8px rgba(44,44,44,0.12), inset 0 1px 0 0 rgba(44,44,44,0.05)`,
           },
         },
       },
@@ -256,7 +255,7 @@ export const createDarkTheme = () => createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
+          background: designTokens.colors.background.elevated,
           backdropFilter: 'blur(20px)',
           border: `1px solid ${designTokens.colors.border.default}`,
           borderRadius: designTokens.radius.lg,
@@ -274,43 +273,6 @@ export const createDarkTheme = () => createTheme({
               backgroundColor: designTokens.colors.accent.primary,
             },
           },
-        },
-      },
-    },
-  },
-});
-
-/**
- * 创建浅色主题
- */
-export const createLightTheme = () => createTheme({
-  palette: {
-    mode: 'light',
-    background: {
-      default: '#ffffff',
-      paper: '#f5f5f5',
-    },
-    primary: {
-      main: designTokens.colors.accent.primary,
-      light: designTokens.colors.accent.bright,
-    },
-    text: {
-      primary: '#1a1a1a',
-      secondary: '#666666',
-    },
-    divider: designTokens.colors.border.default,
-  },
-  typography: {
-    fontFamily: designTokens.typography.fontFamily,
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          background: '#ffffff',
-          border: `1px solid ${designTokens.colors.border.default}`,
-          borderRadius: designTokens.radius.lg,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         },
       },
     },

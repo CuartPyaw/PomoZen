@@ -1,27 +1,27 @@
 /**
- * Linear/Modern 设计系统背景样式
+ * 中国禅意设计系统背景样式
  *
  * 实现多层背景系统：
- * - 基础渐变层
+ * - 基础渐变层（宣纸白质感）
  * - 噪点纹理层
- * - 动态光斑层
+ * - 动态光斑层（竹青、暖木、青瓷）
  * - 网格覆盖层
  *
  * @module background
  */
 
-/* 基础渐变背景 - 创建垂直深度 */
+/* 基础渐变背景 - 创建宣纸白质感 */
 .app-background {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at top, #0a0a0f 0%, #050506 50%, #020203 100%);
+  background: radial-gradient(ellipse at top, #F5F2EB 0%, #F0ECE5 50%, #E8E4DC 100%);
   z-index: -2;
 }
 
-/* 噪点纹理层 - 添加触感质感，防止色带 */
+/* 噪点纹理层 - 添加宣纸触感质感 */
 .app-background::before {
   content: '';
   position: absolute;
@@ -29,12 +29,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.015;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   pointer-events: none;
 }
 
-/* 动态光斑层 - 创建电影级照明效果 */
+/* 动态光斑层 - 创建柔和禅意照明效果 */
 .ambient-blobs {
   position: fixed;
   top: 0;
@@ -46,7 +46,7 @@
   pointer-events: none;
 }
 
-/* 主光斑 - 顶部中央，主要强调色 */
+/* 主光斑 - 顶部中央，竹青色 */
 .blob-primary {
   position: absolute;
   top: -200px;
@@ -54,32 +54,32 @@
   transform: translateX(-50%);
   width: 900px;
   height: 1400px;
-  background: radial-gradient(ellipse, rgba(94, 106, 210, 0.25) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(122, 145, 141, 0.18) 0%, transparent 70%);
   filter: blur(150px);
   animation: float-primary 10s ease-in-out infinite;
 }
 
-/* 次要光斑 - 左侧，紫/粉色调 */
+/* 次要光斑 - 左侧，暖木色 */
 .blob-secondary {
   position: absolute;
   top: 20%;
   left: -200px;
   width: 600px;
   height: 800px;
-  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(196, 167, 125, 0.12) 0%, transparent 70%);
   filter: blur(120px);
   animation: float-secondary 9s ease-in-out infinite;
   animation-delay: -2s;
 }
 
-/* 第三光斑 - 右侧，靛蓝/蓝调 */
+/* 第三光斑 - 右侧，青瓷色 */
 .blob-tertiary {
   position: absolute;
   bottom: 10%;
   right: -150px;
   width: 500px;
   height: 700px;
-  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(122, 139, 139, 0.10) 0%, transparent 70%);
   filter: blur(100px);
   animation: float-tertiary 8s ease-in-out infinite;
   animation-delay: -4s;
@@ -92,7 +92,7 @@
   left: 30%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(ellipse, rgba(94, 106, 210, 0.10) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(122, 145, 141, 0.08) 0%, transparent 70%);
   filter: blur(130px);
   animation: pulse-accent 12s ease-in-out infinite;
   animation-delay: -3s;
@@ -137,7 +137,7 @@
   }
 }
 
-/* 网格覆盖层 - 添加技术精度感 */
+/* 网格覆盖层 - 添加淡雅精度感 */
 .grid-overlay {
   position: fixed;
   top: 0;
@@ -148,24 +148,24 @@
   opacity: 0.02;
   pointer-events: none;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 1) 1px, transparent 1px);
+    linear-gradient(to right, rgba(44, 44, 44, 1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(44, 44, 44, 1) 1px, transparent 1px);
   background-size: 64px 64px;
   background-position: center center;
 }
 
-/* 渐变标题样式 */
+/* 渐变标题样式 - 墨黑色 */
 .gradient-title {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.7) 100%);
+  background: linear-gradient(to bottom, rgba(44, 44, 44, 1) 0%, rgba(44, 44, 44, 0.95) 50%, rgba(44, 44, 44, 0.7) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
 
-/* 强调色渐变文字 */
+/* 强调色渐变文字 - 竹青色 */
 .gradient-accent {
-  background: linear-gradient(to right, #5E6AD2, #6366F1, #5E6AD2);
+  background: linear-gradient(to right, #7A918D, #8FA398, #7A918D);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -196,7 +196,7 @@
   }
 }
 
-/* 卡片鼠标跟踪聚光灯效果 */
+/* 卡片鼠标跟踪聚光灯效果 - 竹青辉光 */
 .card-spotlight {
   position: absolute;
   top: 0;
@@ -208,7 +208,7 @@
   transition: opacity 0.3s ease;
   background: radial-gradient(
     300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(94, 106, 210, 0.15),
+    rgba(122, 145, 141, 0.12),
     transparent
   );
   border-radius: inherit;
@@ -244,25 +244,25 @@
   left: 100%;
 }
 
-/* 滚动条样式 */
+/* 滚动条样式 - 禅意风格 */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(44, 44, 44, 0.02);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(44, 44, 44, 0.1);
   border-radius: 4px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(44, 44, 44, 0.15);
   border-color: transparent;
   background-clip: padding-box;
 }

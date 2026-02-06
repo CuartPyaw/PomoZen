@@ -62,7 +62,6 @@ import {
   TimeDistributionHeatmap,
 } from './components/Charts';
 import './styles/background.css';
-import './App.css';
 
 // 类型定义
 

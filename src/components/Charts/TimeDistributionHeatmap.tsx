@@ -23,12 +23,13 @@ interface TimeDistributionHeatmapProps {
  * 根据专注时长获取颜色
  */
 const getColorForDuration = (duration: number, maxDuration: number): string => {
-  if (duration === 0) return 'rgba(255, 255, 255, 0.03)';
+  if (duration === 0) return 'rgba(44, 44, 44, 0.03)';
 
   const intensity = duration / maxDuration;
-  const baseColor = { r: 94, g: 106, b: 210 }; // #5E6AD2
+  // 使用暖木色（褐色），颜色越深专注度越高
+  const baseColor = { r: 196, g: 167, b: 125 }; // #C4A77D
 
-  return `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.2 + intensity * 0.8})`;
+  return `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.2 + intensity * 0.6})`;
 };
 
 /**
@@ -102,7 +103,7 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
                 height: 60,
                 backgroundColor: getColorForDuration(item.duration, maxDuration),
                 border: '1px solid',
-                borderColor: 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(44, 44, 44, 0.08)',
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -111,7 +112,7 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
-                  borderColor: 'rgba(94, 106, 210, 0.5)',
+                  borderColor: 'rgba(196, 167, 125, 0.4)',
                   zIndex: 1,
                 },
               }}
@@ -122,7 +123,7 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
                   sx={{
                     fontSize: '0.65rem',
                     fontWeight: 600,
-                    color: item.duration > maxDuration * 0.6 ? '#ffffff' : 'rgba(255, 255, 255, 0.9)',
+                    color: item.duration > maxDuration * 0.6 ? '#2C2C2C' : 'rgba(44, 44, 44, 0.7)',
                   }}
                 >
                   {item.hour}
@@ -164,7 +165,7 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
                   maxDuration
                 ),
                 border: '1px solid',
-                borderColor: 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(44, 44, 44, 0.08)',
                 borderRadius: 1,
               }}
             />

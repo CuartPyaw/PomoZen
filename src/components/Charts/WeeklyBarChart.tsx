@@ -41,23 +41,23 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
       case 'count':
         datasetData = data.map(d => d.sessions);
         label = '专注次数';
-        color = '#7B8BE7';
-        backgroundColor = 'rgba(123, 139, 231, 0.6)';
+        color = '#8FA398';
+        backgroundColor = 'rgba(143, 163, 152, 0.6)';
         break;
       case 'average':
         datasetData = data.map(d =>
           d.sessions > 0 ? Math.round(d.duration / d.sessions) : 0
         );
         label = '平均时长（分钟）';
-        color = '#5E6AD2';
-        backgroundColor = 'rgba(94, 106, 210, 0.6)';
+        color = '#7A918D';
+        backgroundColor = 'rgba(122, 145, 141, 0.6)';
         break;
       case 'duration':
       default:
         datasetData = data.map(d => d.duration);
         label = '专注时长（分钟）';
-        color = '#5E6AD2';
-        backgroundColor = 'rgba(94, 106, 210, 0.6)';
+        color = '#7A918D';
+        backgroundColor = 'rgba(122, 145, 141, 0.6)';
         break;
     }
 

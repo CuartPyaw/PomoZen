@@ -43,9 +43,9 @@ export const createChartTheme = (muiTheme: Theme) => {
     color: muiTheme.palette.text.primary,
     borderColor: muiTheme.palette.divider,
     gridColor: `${muiTheme.palette.divider}33`,
-    primaryColor: '#5E6AD2',
-    secondaryColor: '#7B8BE7',
-    backgroundColor: 'rgba(94, 106, 210, 0.1)',
+    primaryColor: '#7A918D',
+    secondaryColor: '#8FA398',
+    backgroundColor: 'rgba(122, 145, 141, 0.1)',
     fontFamily: muiTheme.typography.fontFamily,
   };
 };
@@ -71,7 +71,7 @@ export const chartDefaultOptions = {
       backgroundColor: 'rgba(10, 10, 12, 0.9)',
       titleColor: '#ffffff',
       bodyColor: '#ffffff',
-      borderColor: 'rgba(94, 106, 210, 0.5)',
+      borderColor: 'rgba(122, 145, 141, 0.3)',
       borderWidth: 1,
       padding: 12,
       displayColors: true,
@@ -92,7 +92,7 @@ export const chartDefaultOptions = {
     y: {
       beginAtZero: true,
       grid: {
-        color: 'rgba(255, 255, 255, 0.06)',
+        color: 'rgba(44, 44, 44, 0.08)',
       },
       ticks: {
         font: {

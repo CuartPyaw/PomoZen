@@ -1513,7 +1513,7 @@ const displayIsRunning = isRunningForMode[mode];
       <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', py: 2 }}>
         {/* 模式切换按钮组 */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(255,255,255,0.06)' } }}>
+          <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(44,44,44,0.03)', borderRadius: 2, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(44,44,44,0.08)' } }}>
             <Button
               onClick={() => mode !== 'focus' && handleManualModeToggle('focus')}
               sx={{
@@ -1521,9 +1521,9 @@ const displayIsRunning = isRunningForMode[mode];
                 borderRadius: 2,
                 bgcolor: mode === 'focus' ? themeColor.primary : 'transparent',
                 color: '#3d3d3d',
-                borderColor: mode === 'focus' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                borderColor: mode === 'focus' ? 'transparent' : 'rgba(44,44,44,0.08)',
                 '&:hover': {
-                  bgcolor: mode === 'focus' ? themeColor.primary : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'focus' ? themeColor.primary : 'rgba(44,44,44,0.05)',
                 },
               }}
             >
@@ -1536,9 +1536,9 @@ const displayIsRunning = isRunningForMode[mode];
                 borderRadius: 2,
                 bgcolor: mode === 'break' ? modeColors.break.primary : 'transparent',
                 color: '#3d3d3d',
-                borderColor: mode === 'break' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                borderColor: mode === 'break' ? 'transparent' : 'rgba(44,44,44,0.08)',
                 '&:hover': {
-                  bgcolor: mode === 'break' ? modeColors.break.primary : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'break' ? modeColors.break.primary : 'rgba(44,44,44,0.05)',
                 },
               }}
             >
@@ -1551,9 +1551,9 @@ const displayIsRunning = isRunningForMode[mode];
                 borderRadius: 2,
                 bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'transparent',
                 color: '#3d3d3d',
-                borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(255,255,255,0.06)',
+                borderColor: mode === 'longBreak' ? 'transparent' : 'rgba(44,44,44,0.08)',
                 '&:hover': {
-                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'rgba(255,255,255,0.05)',
+                  bgcolor: mode === 'longBreak' ? modeColors.longBreak.primary : 'rgba(44,44,44,0.05)',
                 },
               }}
             >
@@ -1570,7 +1570,7 @@ const displayIsRunning = isRunningForMode[mode];
             mb: 3,
             bgcolor: 'transparent',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid rgba(44,44,44,0.08)',
             overflow: 'visible',
             position: 'relative',
             '&::before': {
@@ -1580,7 +1580,7 @@ const displayIsRunning = isRunningForMode[mode];
               left: 0,
               right: 0,
               height: '1px',
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.1), transparent)',
+              background: 'linear-gradient(to bottom, rgba(44,44,44,0.12), transparent)',
               borderRadius: '16px 16px 0 0',
             },
           }}
@@ -1594,7 +1594,7 @@ const displayIsRunning = isRunningForMode[mode];
                   cy={130}
                   r={radius}
                   fill="none"
-                  stroke="rgba(255,255,255,0.06)"
+                  stroke="rgba(44,44,44,0.08)"
                   strokeWidth={12}
                 />
                 <circle
@@ -1697,7 +1697,7 @@ const displayIsRunning = isRunningForMode[mode];
         {/* 快捷键、专注统计、运行状态横向排布 */}
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           {/* 键盘快捷键提示 */}
-          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                 <KeyboardIcon sx={{ color: '#2C2C2C', fontSize: 18 }} />
@@ -1706,8 +1706,8 @@ const displayIsRunning = isRunningForMode[mode];
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
-                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.08)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.06)' }} />
+                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(44,44,44,0.1)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(44,44,44,0.08)' }} />
+                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(44,44,44,0.1)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(44,44,44,0.08)' }} />
               </Box>
             </CardContent>
           </Card>
@@ -1717,9 +1717,9 @@ const displayIsRunning = isRunningForMode[mode];
             elevation={0}
             sx={{
               borderRadius: 4,
-              bgcolor: 'rgba(255,255,255,0.03)',
+              bgcolor: 'rgba(44,44,44,0.03)',
               backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: '1px solid rgba(44,44,44,0.08)',
               flex: 1,
               minWidth: { xs: '100%', sm: '200px' },
               cursor: 'pointer',
@@ -1747,7 +1747,7 @@ const displayIsRunning = isRunningForMode[mode];
                     bgcolor: modeColors.focus.primary,
                     color: '#ffffff',
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(44,44,44,0.08)',
                     fontWeight: 500,
                   }}
                 />
@@ -1770,7 +1770,7 @@ const displayIsRunning = isRunningForMode[mode];
           </Card>
 
           {/* 运行状态面板 */}
-          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.06)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                 <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
@@ -1782,30 +1782,30 @@ const displayIsRunning = isRunningForMode[mode];
                   label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(255,255,255,0.08)',
+                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(44,44,44,0.1)',
                     color: isRunningForMode.focus ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
                 <Chip
                   label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(255,255,255,0.08)',
+                    bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(44,44,44,0.1)',
                     color: isRunningForMode.break ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
                 <Chip
                   label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(255,255,255,0.08)',
+                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(44,44,44,0.1)',
                     color: isRunningForMode.longBreak ? '#ffffff' : '#2C2C2C',
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
               </Box>
@@ -1821,10 +1821,10 @@ const displayIsRunning = isRunningForMode[mode];
           position: 'fixed',
           bottom: 24,
           right: 24,
-          bgcolor: 'rgba(255,255,255,0.08)',
+          bgcolor: 'rgba(44,44,44,0.1)',
           color: 'rgba(255,255,255,0.9)',
           backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.06)',
+          border: '1px solid rgba(44,44,44,0.08)',
           '&:hover': {
             bgcolor: 'rgba(255,255,255,0.12)',
             color: 'rgba(255,255,255,1)',
@@ -2007,15 +2007,15 @@ const displayIsRunning = isRunningForMode[mode];
             {/* 控制面板 */}
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>
               {/* 视图切换 */}
-              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2 }}>
+              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(44,44,44,0.03)', borderRadius: 2 }}>
                 <Button
                   onClick={() => setChartViewMode('daily')}
                   sx={{
                     borderRadius: 2,
                     bgcolor: chartViewMode === 'daily' ? modeColors.focus.primary : 'transparent',
-                    color: chartViewMode === 'daily' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: chartViewMode === 'daily' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     '&:hover': {
-                      bgcolor: chartViewMode === 'daily' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: chartViewMode === 'daily' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2026,9 +2026,9 @@ const displayIsRunning = isRunningForMode[mode];
                   sx={{
                     borderRadius: 2,
                     bgcolor: chartViewMode === 'weekly' ? modeColors.focus.primary : 'transparent',
-                    color: chartViewMode === 'weekly' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: chartViewMode === 'weekly' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     '&:hover': {
-                      bgcolor: chartViewMode === 'weekly' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: chartViewMode === 'weekly' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2039,9 +2039,9 @@ const displayIsRunning = isRunningForMode[mode];
                   sx={{
                     borderRadius: 2,
                     bgcolor: chartViewMode === 'monthly' ? modeColors.focus.primary : 'transparent',
-                    color: chartViewMode === 'monthly' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: chartViewMode === 'monthly' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     '&:hover': {
-                      bgcolor: chartViewMode === 'monthly' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: chartViewMode === 'monthly' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2050,16 +2050,16 @@ const displayIsRunning = isRunningForMode[mode];
               </ButtonGroup>
 
               {/* 数据指标切换 */}
-              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2 }}>
+              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(44,44,44,0.03)', borderRadius: 2 }}>
                 <Button
                   onClick={() => setDataMetric('duration')}
                   sx={{
                     borderRadius: 2,
                     bgcolor: dataMetric === 'duration' ? modeColors.focus.primary : 'transparent',
-                    color: dataMetric === 'duration' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: dataMetric === 'duration' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     fontSize: '0.8rem',
                     '&:hover': {
-                      bgcolor: dataMetric === 'duration' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: dataMetric === 'duration' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2070,10 +2070,10 @@ const displayIsRunning = isRunningForMode[mode];
                   sx={{
                     borderRadius: 2,
                     bgcolor: dataMetric === 'count' ? modeColors.focus.primary : 'transparent',
-                    color: dataMetric === 'count' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: dataMetric === 'count' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     fontSize: '0.8rem',
                     '&:hover': {
-                      bgcolor: dataMetric === 'count' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: dataMetric === 'count' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2084,10 +2084,10 @@ const displayIsRunning = isRunningForMode[mode];
                   sx={{
                     borderRadius: 2,
                     bgcolor: dataMetric === 'average' ? modeColors.focus.primary : 'transparent',
-                    color: dataMetric === 'average' ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                    color: dataMetric === 'average' ? '#ffffff' : 'rgba(44,44,44,0.6)',
                     fontSize: '0.8rem',
                     '&:hover': {
-                      bgcolor: dataMetric === 'average' ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                      bgcolor: dataMetric === 'average' ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -2096,7 +2096,7 @@ const displayIsRunning = isRunningForMode[mode];
               </ButtonGroup>
 
               {/* 时间范围选择 */}
-              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2 }}>
+              <ButtonGroup size="small" sx={{ bgcolor: 'rgba(44,44,44,0.03)', borderRadius: 2 }}>
                 {(['7days', '30days', '90days', 'all'] as TimeRange[]).map((range) => (
                   <Button
                     key={range}
@@ -2104,10 +2104,10 @@ const displayIsRunning = isRunningForMode[mode];
                     sx={{
                       borderRadius: 2,
                       bgcolor: chartTimeRange === range ? modeColors.focus.primary : 'transparent',
-                      color: chartTimeRange === range ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                      color: chartTimeRange === range ? '#ffffff' : 'rgba(44,44,44,0.6)',
                       fontSize: '0.8rem',
                       '&:hover': {
-                        bgcolor: chartTimeRange === range ? modeColors.focus.bright : 'rgba(255,255,255,0.05)',
+                        bgcolor: chartTimeRange === range ? modeColors.focus.bright : 'rgba(44,44,44,0.05)',
                       },
                     }}
                   >
@@ -2168,7 +2168,7 @@ const displayIsRunning = isRunningForMode[mode];
               sx={{
                 borderRadius: 3,
                 bgcolor: 'rgba(255,255,255,0.02)',
-                borderColor: 'rgba(255,255,255,0.06)',
+                borderColor: 'rgba(44,44,44,0.08)',
                 mb: 3
               }}
             >
@@ -2191,7 +2191,7 @@ const displayIsRunning = isRunningForMode[mode];
               sx={{
                 borderRadius: 3,
                 bgcolor: 'rgba(255,255,255,0.02)',
-                borderColor: 'rgba(255,255,255,0.06)',
+                borderColor: 'rgba(44,44,44,0.08)',
                 mb: 3
               }}
             >

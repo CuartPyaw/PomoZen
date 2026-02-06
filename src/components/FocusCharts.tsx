@@ -17,7 +17,7 @@ import type { DailyChartDataPoint, WeeklyChartDataPoint } from '../types/statist
 export const DailyLineChart: React.FC<{ data: DailyChartDataPoint[] }> = ({ data }) => {
   if (data.length === 0) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(44,44,44,0.5)' }}>
         暂无数据
       </div>
     );
@@ -26,21 +26,21 @@ export const DailyLineChart: React.FC<{ data: DailyChartDataPoint[] }> = ({ data
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,44,44,0.08)" />
         <XAxis
           dataKey="date"
-          stroke="rgba(255,255,255,0.6)"
-          tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+          stroke="rgba(44,44,44,0.6)"
+          tick={{ fill: 'rgba(44,44,44,0.6)', fontSize: 12 }}
         />
         <YAxis
-          stroke="rgba(255,255,255,0.6)"
-          tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-          label={{ value: '分钟', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
+          stroke="rgba(44,44,44,0.6)"
+          tick={{ fill: 'rgba(44,44,44,0.6)', fontSize: 12 }}
+          label={{ value: '分钟', angle: -90, position: 'insideLeft', fill: 'rgba(44,44,44,0.6)' }}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: 'rgba(10,10,12,0.95)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid rgba(44,44,44,0.08)',
             borderRadius: 8,
             color: '#ffffff',
           }}
@@ -48,15 +48,15 @@ export const DailyLineChart: React.FC<{ data: DailyChartDataPoint[] }> = ({ data
           labelStyle={{ color: 'rgba(255,255,255,0.8)' }}
         />
         <Legend
-          wrapperStyle={{ color: 'rgba(255,255,255,0.8)' }}
+          wrapperStyle={{ color: 'rgba(44,44,44,0.8)' }}
         />
         <Line
           type="monotone"
           dataKey="duration"
-          stroke="#5E6AD2"
+          stroke="#7A918D"
           strokeWidth={2}
           name="专注时长（分钟）"
-          dot={{ fill: '#5E6AD2', strokeWidth: 2, r: 4 }}
+          dot={{ fill: '#7A918D', strokeWidth: 2, r: 4 }}
           activeDot={{ r: 6 }}
         />
       </LineChart>
@@ -73,7 +73,7 @@ export const DailyLineChart: React.FC<{ data: DailyChartDataPoint[] }> = ({ data
 export const WeeklyBarChart: React.FC<{ data: WeeklyChartDataPoint[] }> = ({ data }) => {
   if (data.length === 0) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(44,44,44,0.5)' }}>
         暂无数据
       </div>
     );
@@ -82,21 +82,21 @@ export const WeeklyBarChart: React.FC<{ data: WeeklyChartDataPoint[] }> = ({ dat
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,44,44,0.08)" />
         <XAxis
           dataKey="week"
-          stroke="rgba(255,255,255,0.6)"
-          tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+          stroke="rgba(44,44,44,0.6)"
+          tick={{ fill: 'rgba(44,44,44,0.6)', fontSize: 11 }}
         />
         <YAxis
-          stroke="rgba(255,255,255,0.6)"
-          tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-          label={{ value: '分钟', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
+          stroke="rgba(44,44,44,0.6)"
+          tick={{ fill: 'rgba(44,44,44,0.6)', fontSize: 12 }}
+          label={{ value: '分钟', angle: -90, position: 'insideLeft', fill: 'rgba(44,44,44,0.6)' }}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: 'rgba(10,10,12,0.95)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid rgba(44,44,44,0.08)',
             borderRadius: 8,
             color: '#ffffff',
           }}
@@ -104,11 +104,11 @@ export const WeeklyBarChart: React.FC<{ data: WeeklyChartDataPoint[] }> = ({ dat
           labelStyle={{ color: 'rgba(255,255,255,0.8)' }}
         />
         <Legend
-          wrapperStyle={{ color: 'rgba(255,255,255,0.8)' }}
+          wrapperStyle={{ color: 'rgba(44,44,44,0.8)' }}
         />
         <Bar
           dataKey="duration"
-          fill="#5E6AD2"
+          fill="#7A918D"
           name="周专注时长（分钟）"
           radius={[4, 4, 0, 0]}
         />

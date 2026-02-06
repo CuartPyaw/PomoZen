@@ -1505,7 +1505,7 @@ const displayIsRunning = isRunningForMode[mode];
               letterSpacing: '-0.02em',
             }}
           >
-            Tomato Clock
+            PomoZen
           </Typography>
         </Toolbar>
       </AppBar>

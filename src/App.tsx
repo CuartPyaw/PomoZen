@@ -1474,7 +1474,7 @@ const displayIsRunning = isRunningForMode[mode];
   const modeColors = {
     focus: { primary: '#7A918D', bright: '#8FA398', glow: 'rgba(122,145,141,0.3)' },
     break: { primary: '#C4A77D', bright: '#D4B896', glow: 'rgba(196,167,125,0.3)' },
-    longBreak: { primary: '#7A8B8B', bright: '#8B9D9D', glow: 'rgba(122,139,139,0.3)' },
+    longBreak: { primary: '#6A6A6A', bright: '#7A7A7A', glow: 'rgba(106,106,106,0.3)' },
   };
 
   const themeColor = modeColors[mode];

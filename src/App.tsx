@@ -36,6 +36,8 @@ import {
   Zoom,
   ThemeProvider
 } from '@mui/material';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -61,6 +63,7 @@ import {
   MonthlyLineChart,
   TimeDistributionHeatmap,
 } from './components/Charts';
+import { playNotificationSound } from './utils/audioPlayer';
 import './styles/background.css';
 
 // 类型定义
@@ -111,6 +114,7 @@ const STORAGE_KEYS = {
   CHART_VIEW_MODE: 'tomato-chart-view-mode',    // 图表视图模式
   CHART_TIME_RANGE: 'tomato-chart-time-range',  // 图表时间范围
   CHART_DATA_METRIC: 'tomato-chart-data-metric', // 图表数据指标
+  SOUND_ENABLED: 'tomato-soundEnabled',         // 通知声音开关
 } as const;
 
 // 组件定义
@@ -174,6 +178,16 @@ function App() {
   const [autoStart, setAutoStart] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.AUTO_START);
     return saved ? saved === 'true' : true;
+  });
+
+  /**
+   * 通知声音开关
+   * 启用后，计时器完成时会播放提示音
+   * @default true
+   */
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.SOUND_ENABLED);
+    return saved !== 'false'; // 默认开启
   });
 
   /**
@@ -734,14 +748,21 @@ function App() {
    * 显示通知弹窗
    * @param title - 通知标题
    * @param body - 通知内容
+   * @param playSound - 是否播放声音（默认根据 soundEnabled 设置）
    */
-  const sendNotification = (title: string, body: string) => {
+  const sendNotification = (title: string, body: string, playSound?: boolean) => {
     // 清除之前的定时器，防止内存泄漏
     if (notificationTimeoutRef.current) {
       clearTimeout(notificationTimeoutRef.current);
     }
 
     setNotificationDialog({ open: true, title, message: body });
+
+    // 播放声音（如果启用且未明确禁用）
+    const shouldPlaySound = playSound !== undefined ? playSound : soundEnabled;
+    if (shouldPlaySound) {
+      playNotificationSound();
+    }
 
     // 3秒后自动关闭
     notificationTimeoutRef.current = setTimeout(() => {
@@ -1928,6 +1949,38 @@ const displayIsRunning = isRunningForMode[mode];
                   size="small"
                 />
               </Box>
+            </Stack>
+
+            {/* 通知设置部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              🔔 通知设置
+            </Typography>
+
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {soundEnabled ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
+                  <Typography variant="body2">启用通知声音</Typography>
+                </Box>
+                <Switch
+                  checked={soundEnabled}
+                  onChange={(e) => {
+                    const newValue = e.target.checked;
+                    setSoundEnabled(newValue);
+                    localStorage.setItem(STORAGE_KEYS.SOUND_ENABLED, String(newValue));
+                  }}
+                  size="small"
+                />
+              </Box>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<VolumeUpIcon />}
+                onClick={() => sendNotification('测试通知', '这是一个测试通知', true)}
+                sx={{ borderRadius: 3 }}
+              >
+                测试通知
+              </Button>
             </Stack>
 
             {/* 循环模式说明 */}

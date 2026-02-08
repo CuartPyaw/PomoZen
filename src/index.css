@@ -11,3 +11,32 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ========================================
+   主题切换过渡动画
+   ======================================== */
+
+/* 全局主题过渡 - 只对主题相关属性应用过渡 */
+*, *::before, *::after {
+  transition-property: background-color, background, border-color, color, fill, stroke, opacity, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 为背景层添加特殊过渡 */
+.app-background,
+.ambient-blobs,
+.blob-primary,
+.blob-secondary,
+.blob-tertiary,
+.blob-accent,
+.grid-overlay {
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 尊重用户减少动画的偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+  }
+}

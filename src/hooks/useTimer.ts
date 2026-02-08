@@ -48,7 +48,7 @@ export function useTimer(
     customBreakTime: number;
     customLongBreakTime: number;
   },
-  onComplete: (mode: TimerMode) => void
+  onComplete: (mode: TimerMode, completedDuration: number) => void
 ) {
   // 当前计时器模式
   const [mode, setMode] = useState<TimerMode>(() => {
@@ -164,6 +164,7 @@ export function useTimer(
     worker.onmessage = (e: MessageEvent) => {
       const data = e.data as WorkerMessage;
       const { type, mode: msgMode } = data;
+      console.log('[Main] Worker message received:', data);
 
       if (type === 'UPDATE') {
         setIsRunningForMode((prev) => ({ ...prev, [msgMode]: true }));
@@ -180,9 +181,9 @@ export function useTimer(
           Logger.error('Failed to save time left', error);
         }
       } else if (type === 'COMPLETE') {
-        Logger.debug('Worker COMPLETE message received', { mode: msgMode, currentMode: currentModeRef.current });
+        Logger.debug('Worker COMPLETE message received', { mode: msgMode, currentMode: currentModeRef.current, completedDuration: data.completedDuration });
         setIsRunningForMode((prev) => ({ ...prev, [msgMode]: false }));
-        onComplete(msgMode);
+        onComplete(msgMode, data.completedDuration);
       }
     };
 

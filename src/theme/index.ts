@@ -206,33 +206,40 @@ export const createZenTheme = (mode: ThemeMode = 'light') => {
         easeInOut: tokens.animation.easing.expoOut,
       },
     },
-    shadows: [
-      'none',
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.hover}, 0 4px 12px ${mode === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(44,44,44,0.12)'}, 0 12px 24px ${tokens.colors.accent.glow}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-      `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`,
-    ],
+    shadows: (() => {
+      // 定义基础阴影样式
+      const baseShadow = `0 0 0 1px ${tokens.colors.border.default}, 0 2px 8px ${mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(44,44,44,0.08)'}, 0 8px 16px ${mode === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(44,44,44,0.04)'}`;
+      const elevatedShadow = `0 0 0 1px ${tokens.colors.border.hover}, 0 4px 12px ${mode === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(44,44,44,0.12)'}, 0 12px 24px ${tokens.colors.accent.glow}`;
+
+      // 使用 as any 绕过严格的类型检查，因为 MUI 需要恰好 25 个元素
+      return [
+        'none',           // 0
+        baseShadow,       // 1
+        elevatedShadow,   // 2
+        baseShadow,       // 3
+        baseShadow,       // 4
+        baseShadow,       // 5
+        baseShadow,       // 6
+        baseShadow,       // 7
+        baseShadow,       // 8
+        baseShadow,       // 9
+        baseShadow,       // 10
+        baseShadow,       // 11
+        baseShadow,       // 12
+        baseShadow,       // 13
+        baseShadow,       // 14
+        baseShadow,       // 15
+        baseShadow,       // 16
+        baseShadow,       // 17
+        baseShadow,       // 18
+        baseShadow,       // 19
+        baseShadow,       // 20
+        baseShadow,       // 21
+        baseShadow,       // 22
+        baseShadow,       // 23
+        baseShadow,       // 24
+      ] as const;
+    })() as any,
     components: {
       MuiCard: {
         styleOverrides: {

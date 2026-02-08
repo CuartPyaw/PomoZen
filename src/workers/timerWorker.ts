@@ -22,6 +22,13 @@ const intervalIds: Record<TimerMode, ReturnType<typeof setInterval> | null> = {
   longBreak: null,
 };
 
+// 追踪每个模式的初始时间（用于计算实际完成的时长）
+const initialTimes: Record<TimerMode, number> = {
+  focus: 0,
+  break: 0,
+  longBreak: 0,
+};
+
 /**
  * 向主线程发送消息
  */
@@ -35,31 +42,39 @@ function postMessage(message: WorkerMessage): void {
  * @param logCompletion 是否在完成时记录日志
  */
 function createTimerInterval(mode: TimerMode, logCompletion: boolean = false): void {
+  console.log('[Worker] createTimerInterval called for mode:', mode, 'timeLeft:', states[mode].timeLeft);
   intervalIds[mode] = setInterval(() => {
+    console.log('[Worker] setInterval callback executing for mode:', mode);
     states[mode].timeLeft--;
 
-    postMessage({
+    const message = {
       type: 'UPDATE',
       mode,
       timeLeft: states[mode].timeLeft,
-    });
+    };
+    console.log('[Worker] Sending UPDATE:', mode, states[mode].timeLeft);
+    postMessage(message);
 
     if (states[mode].timeLeft === 0) {
       if (logCompletion) {
         console.log(`=== Worker: Timer ${mode} completed ===`);
       }
       stopTimer(mode);
-      postMessage({ type: 'COMPLETE', mode });
+      // 发送完成的时长（初始时间 - 剩余时间 = 0）
+      postMessage({ type: 'COMPLETE', mode, completedDuration: initialTimes[mode] });
     }
   }, 1000);
+  console.log('[Worker] setInterval created for mode:', mode, 'intervalId:', intervalIds[mode]);
 }
 
 /**
  * 开始指定模式的计时
  */
 function startTimer(mode: TimerMode, initialTime: number): void {
+  console.log('[Worker] startTimer called:', { mode, initialTime });
   states[mode].timeLeft = initialTime;
   states[mode].isRunning = true;
+  initialTimes[mode] = initialTime; // 记录初始时间
 
   if (intervalIds[mode] !== null) {
     clearInterval(intervalIds[mode]);

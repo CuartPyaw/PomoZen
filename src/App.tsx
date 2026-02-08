@@ -9,7 +9,7 @@
  * @version 2.0.0
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import {
   Container,
   Box,
@@ -70,6 +70,35 @@ import './styles/background.css';
 // 常量配置
 const POMODORO_CYCLE_COUNT = 5;
 
+// 计时器圆形进度条配置
+const TIMER_CIRCLE_CONFIG = {
+  RADIUS: 123,              // 圆环半径
+  STROKE_WIDTH: 12,         // 线条宽度
+  SVG_WIDTH: 270,           // SVG 宽度
+  SVG_HEIGHT: 260,          // SVG 高度
+  CIRCLE_CENTER_X: 130,     // 圆心 X 坐标
+  CIRCLE_CENTER_Y: 130,     // 圆心 Y 坐标
+} as const;
+
+// 模式颜色配置
+const MODE_COLORS = {
+  focus: {
+    primary: '#7A918D',
+    bright: '#8FA398',
+    glow: 'rgba(122,145,141,0.3)',
+  },
+  break: {
+    primary: '#C4A77D',
+    bright: '#D4B896',
+    glow: 'rgba(196,167,125,0.3)',
+  },
+  longBreak: {
+    primary: '#6A6A6A',
+    bright: '#7A7A7A',
+    glow: 'rgba(106,106,106,0.3)',
+  },
+} as const;
+
 /**
  * PomoZen 主组件
  *
@@ -117,13 +146,14 @@ function App() {
   /**
    * 计时器完成时的处理逻辑
    */
-  function handleTimerComplete(completedMode: TimerMode) {
+  function handleTimerComplete(completedMode: TimerMode, completedDuration: number) {
     lastCompletedModeRef.current = completedMode;
 
     // 发送通知
     if (completedMode === 'focus') {
       notifications.sendNotification('专注结束', '时间到了！该休息一下了');
-      statistics.updateTodayFocusRecord(timer.getFocusTime());
+      // 使用实际完成的时长（秒）
+      statistics.updateTodayFocusRecord(completedDuration);
     } else if (completedMode === 'break') {
       notifications.sendNotification('休息结束', '休息完成！开始专注吧');
     } else if (completedMode === 'longBreak') {
@@ -210,11 +240,10 @@ function App() {
    * 计算 SVG 环形进度条的参数
    */
   const getProgressParams = () => {
-    const radius = 123;
-    const circumference = 2 * Math.PI * radius;
+    const circumference = 2 * Math.PI * TIMER_CIRCLE_CONFIG.RADIUS;
     const progress = timer.timeLeftForMode[timer.mode] / getTotalTime();
     const offset = circumference * (1 - progress);
-    return { radius, circumference, offset };
+    return { circumference, offset };
   };
 
   /**
@@ -242,15 +271,8 @@ function App() {
 
   const displayTime = timer.timeLeftForMode[timer.mode];
   const displayIsRunning = timer.isRunningForMode[timer.mode];
-  const { radius, circumference, offset } = getProgressParams();
-
-  const modeColors = {
-    focus: { primary: '#7A918D', bright: '#8FA398', glow: 'rgba(122,145,141,0.3)' },
-    break: { primary: '#C4A77D', bright: '#D4B896', glow: 'rgba(196,167,125,0.3)' },
-    longBreak: { primary: '#6A6A6A', bright: '#7A7A7A', glow: 'rgba(106,106,106,0.3)' },
-  };
-
-  const themeColor = modeColors[timer.mode];
+  const { circumference, offset } = getProgressParams();
+  const themeColor = MODE_COLORS[timer.mode];
 
   // ==================== JSX 渲染 ====================
 
@@ -310,11 +332,11 @@ function App() {
                   sx={{
                     minWidth: 100,
                     borderRadius: 2,
-                    bgcolor: timer.mode === 'break' ? modeColors.break.primary : 'transparent',
+                    bgcolor: timer.mode === 'break' ? MODE_COLORS.break.primary : 'transparent',
                     color: '#3d3d3d',
                     borderColor: timer.mode === 'break' ? 'transparent' : 'rgba(44,44,44,0.08)',
                     '&:hover': {
-                      bgcolor: timer.mode === 'break' ? modeColors.break.primary : 'rgba(44,44,44,0.05)',
+                      bgcolor: timer.mode === 'break' ? MODE_COLORS.break.primary : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -325,11 +347,11 @@ function App() {
                   sx={{
                     minWidth: 100,
                     borderRadius: 2,
-                    bgcolor: timer.mode === 'longBreak' ? modeColors.longBreak.primary : 'transparent',
+                    bgcolor: timer.mode === 'longBreak' ? MODE_COLORS.longBreak.primary : 'transparent',
                     color: '#3d3d3d',
                     borderColor: timer.mode === 'longBreak' ? 'transparent' : 'rgba(44,44,44,0.08)',
                     '&:hover': {
-                      bgcolor: timer.mode === 'longBreak' ? modeColors.longBreak.primary : 'rgba(44,44,44,0.05)',
+                      bgcolor: timer.mode === 'longBreak' ? MODE_COLORS.longBreak.primary : 'rgba(44,44,44,0.05)',
                     },
                   }}
                 >
@@ -364,22 +386,22 @@ function App() {
               <CardContent sx={{ pb: 3, pt: 4, px: 2 }}>
                 {/* SVG 环形进度条 */}
                 <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, minHeight: 280 }}>
-                  <svg width={270} height={260} style={{ transform: 'rotate(-90deg)' }}>
+                  <svg width={TIMER_CIRCLE_CONFIG.SVG_WIDTH} height={TIMER_CIRCLE_CONFIG.SVG_HEIGHT} style={{ transform: 'rotate(-90deg)' }}>
                     <circle
-                      cx={130}
-                      cy={130}
-                      r={radius}
+                      cx={TIMER_CIRCLE_CONFIG.CIRCLE_CENTER_X}
+                      cy={TIMER_CIRCLE_CONFIG.CIRCLE_CENTER_Y}
+                      r={TIMER_CIRCLE_CONFIG.RADIUS}
                       fill="none"
                       stroke="rgba(44,44,44,0.08)"
-                      strokeWidth={12}
+                      strokeWidth={TIMER_CIRCLE_CONFIG.STROKE_WIDTH}
                     />
                     <circle
-                      cx={130}
-                      cy={130}
-                      r={radius}
+                      cx={TIMER_CIRCLE_CONFIG.CIRCLE_CENTER_X}
+                      cy={TIMER_CIRCLE_CONFIG.CIRCLE_CENTER_Y}
+                      r={TIMER_CIRCLE_CONFIG.RADIUS}
                       fill="none"
                       stroke={themeColor.primary}
-                      strokeWidth={12}
+                      strokeWidth={TIMER_CIRCLE_CONFIG.STROKE_WIDTH}
                       strokeDasharray={circumference}
                       strokeDashoffset={offset}
                       strokeLinecap="round"
@@ -518,7 +540,7 @@ function App() {
                       label={`总记录: ${statistics.focusHistory.size} 天`}
                       size="small"
                       sx={{
-                        bgcolor: modeColors.focus.primary,
+                        bgcolor: MODE_COLORS.focus.primary,
                         color: '#ffffff',
                         fontSize: '0.75rem',
                         border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
@@ -555,7 +577,7 @@ function App() {
                       label={timer.isRunningForMode.focus ? '专注运行中' : '专注停止'}
                       size="small"
                       sx={{
-                        bgcolor: timer.isRunningForMode.focus ? modeColors.focus.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                        bgcolor: timer.isRunningForMode.focus ? MODE_COLORS.focus.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
                         color: timer.isRunningForMode.focus ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                         fontSize: '0.75rem',
                         border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
@@ -565,7 +587,7 @@ function App() {
                       label={timer.isRunningForMode.break ? '短休息运行中' : '短休息停止'}
                       size="small"
                       sx={{
-                        bgcolor: timer.isRunningForMode.break ? modeColors.break.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                        bgcolor: timer.isRunningForMode.break ? MODE_COLORS.break.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
                         color: timer.isRunningForMode.break ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                         fontSize: '0.75rem',
                         border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
@@ -575,7 +597,7 @@ function App() {
                       label={timer.isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
                       size="small"
                       sx={{
-                        bgcolor: timer.isRunningForMode.longBreak ? modeColors.longBreak.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                        bgcolor: timer.isRunningForMode.longBreak ? MODE_COLORS.longBreak.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
                         color: timer.isRunningForMode.longBreak ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                         fontSize: '0.75rem',
                         border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
@@ -610,7 +632,7 @@ function App() {
 
           {/* 设置对话框 */}
           {settings.showSettings && (
-            <SettingsDialog
+            <MemoizedSettingsDialog
               open={settings.showSettings}
               onClose={() => settings.setShowSettings(false)}
               settings={settings}
@@ -624,17 +646,17 @@ function App() {
 
           {/* 统计对话框 */}
           {statistics.showStatsDialog && (
-            <StatsDialog
+            <MemoizedStatsDialog
               open={statistics.showStatsDialog}
               onClose={() => statistics.setShowStatsDialog(false)}
               statistics={statistics}
               settings={settings}
-              modeColors={modeColors}
+              modeColors={MODE_COLORS}
             />
           )}
 
           {/* 通知弹窗 */}
-          <NotificationDialog
+          <MemoizedNotificationDialog
             open={notifications.notificationDialog.open}
             title={notifications.notificationDialog.title}
             message={notifications.notificationDialog.message}
@@ -643,7 +665,7 @@ function App() {
               executeModeSwitch();
             }}
             mode={timer.mode}
-            modeColors={modeColors}
+            modeColors={MODE_COLORS}
           />
         </Box>
       </ThemeProvider>
@@ -677,13 +699,7 @@ function SettingsDialog({
   setThemePreference,
   onTestNotification,
 }: SettingsDialogProps) {
-  const modeColors = {
-    focus: { primary: '#7A918D', bright: '#8FA398' },
-    break: { primary: '#C4A77D', bright: '#D4B896' },
-    longBreak: { primary: '#6A6A6A', bright: '#7A7A7A' },
-  };
-
-  const themeColor = modeColors[timer.mode];
+  const themeColor = MODE_COLORS[timer.mode];
 
   return (
     <Dialog
@@ -872,6 +888,9 @@ function SettingsDialog({
     </Dialog>
   );
 }
+
+// 使用 React.memo 优化渲染
+const MemoizedSettingsDialog = memo(SettingsDialog);
 
 /**
  * 统计对话框组件
@@ -1150,6 +1169,9 @@ function StatsDialog({ open, onClose, statistics, settings, modeColors }: StatsD
   );
 }
 
+// 使用 React.memo 优化渲染
+const MemoizedStatsDialog = memo(StatsDialog);
+
 /**
  * 通知对话框组件
  */
@@ -1204,5 +1226,8 @@ function NotificationDialog({ open, title, message, onClose, mode, modeColors }:
     </Dialog>
   );
 }
+
+// 使用 React.memo 优化渲染
+const MemoizedNotificationDialog = memo(NotificationDialog);
 
 export default App;

@@ -22,7 +22,7 @@ export type WorkerCommand =
  */
 export type WorkerMessage =
   | { type: 'UPDATE'; mode: TimerMode; timeLeft: number }
-  | { type: 'COMPLETE'; mode: TimerMode };
+  | { type: 'COMPLETE'; mode: TimerMode; completedDuration: number };
 
 /**
  * Worker 内部状态类型

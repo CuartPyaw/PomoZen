@@ -203,13 +203,13 @@ export function useStatistics() {
 
     switch (chartTimeRange) {
       case '7days':
-        cutoffDate.setDate(todayString ? new Date(todayString).getDate() - 6 : new Date().getDate() - 6);
+        cutoffDate.setDate(cutoffDate.getDate() - 6);
         break;
       case '30days':
-        cutoffDate.setDate(todayString ? new Date(todayString).getDate() - 29 : new Date().getDate() - 29);
+        cutoffDate.setDate(cutoffDate.getDate() - 29);
         break;
       case '90days':
-        cutoffDate.setDate(todayString ? new Date(todayString).getDate() - 89 : new Date().getDate() - 89);
+        cutoffDate.setDate(cutoffDate.getDate() - 89);
         break;
       case 'all':
       default:

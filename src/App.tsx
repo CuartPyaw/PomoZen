@@ -162,6 +162,11 @@ function App() {
   const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
+   * 最近完成的模式（用于在通知关闭后触发模式切换）
+   */
+  const lastCompletedModeRef = useRef<TimerMode | null>(null);
+
+  /**
    * 自动切换模式开关
    * 启用后，计时器完成会自动切换到下一个模式
    * @default true
@@ -785,11 +790,7 @@ function App() {
       playNotificationSound();
     }
 
-    // 3秒后自动关闭
-    notificationTimeoutRef.current = setTimeout(() => {
-      setNotificationDialog(prev => ({ ...prev, open: false }));
-      notificationTimeoutRef.current = null;
-    }, 3000);
+    // 不再自动超时关闭，需要用户手动点击"知道了"按钮
   };
 
 // 计时器完成处理
@@ -809,6 +810,9 @@ function App() {
   const handleTimerComplete = (completedMode: TimerMode) => {
     console.log('=== handleTimerComplete called ===', { completedMode, currentMode: currentModeRef.current, autoSwitch, pomodoroCycle });
 
+    // 记录最近完成的模式，用于通知关闭后的模式切换
+    lastCompletedModeRef.current = completedMode;
+
     // 发送通知
     if (completedMode === 'focus') {
       sendNotification('专注结束', '时间到了！该休息一下了');
@@ -824,6 +828,13 @@ function App() {
     // 如果启用自动切换，只在当前显示的模式完成时才执行切换
     if (!autoSwitch) {
       console.log('⚠ Auto switch disabled, skipping mode switch');
+      return;
+    }
+
+    // 如果显示通知弹窗（即未启用自动跳过），则不自动切换
+    // 等待用户关闭弹窗后再切换，给用户确认的机会
+    if (!autoSkipNotification) {
+      console.log('⚠ Notification dialog is shown, skipping auto-switch until user closes it');
       return;
     }
 
@@ -907,6 +918,81 @@ function App() {
 
       return true;
     });
+  };
+
+  /**
+   * 执行模式切换（当通知弹窗关闭时调用）
+   */
+  const executeModeSwitch = () => {
+    const completedMode = lastCompletedModeRef.current;
+    if (!completedMode) {
+      console.log('⚠ No completed mode to switch from');
+      return;
+    }
+
+    // 清除记录，防止重复触发
+    lastCompletedModeRef.current = null;
+
+    if (!autoSwitch) {
+      console.log('⚠ Auto switch disabled, skipping mode switch');
+      return;
+    }
+
+    console.log('=== Executing mode switch after notification closed ===', { completedMode });
+
+    let nextMode: TimerMode;
+
+    if (completedMode === 'focus') {
+      nextMode = 'break';
+    } else if (completedMode === 'break') {
+      if (pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT) {
+        nextMode = 'longBreak';
+      } else {
+        nextMode = 'focus';
+      }
+    } else {
+      nextMode = 'focus';
+    }
+
+    // 更新番茄钟周期
+    if (completedMode === 'longBreak') {
+      setPomodoroCycle(1);
+    } else if (completedMode === 'break') {
+      setPomodoroCycle((prev) => prev + 1);
+    }
+
+    // 获取新模式的时间
+    const nextModeTime =
+      nextMode === 'focus'
+        ? getFocusTime()
+        : nextMode === 'break'
+        ? getBreakTime()
+        : getLongBreakTime();
+
+    setTimeLeftForMode((prev) => ({ ...prev, [nextMode]: nextModeTime }));
+
+    // 清理旧的 timeout
+    if (switchTimeoutRef.current) {
+      clearTimeout(switchTimeoutRef.current);
+    }
+
+    // 使用闭包捕获时间值
+    const capturedTime = nextModeTime;
+
+    // 立即切换模式（不延迟，因为用户已经确认了通知）
+    setMode(nextMode);
+
+    if (autoStart) {
+      timerWorkerRef.current?.postMessage({
+        type: 'START',
+        mode: nextMode,
+        initialTime: capturedTime,
+      });
+      setIsRunningForMode((prev) => ({ ...prev, [nextMode]: true }));
+    }
+
+    // 重置 completionGuard
+    setCompletionGuard(false);
   };
 
 // 模式切换
@@ -2009,7 +2095,7 @@ const displayIsRunning = isRunningForMode[mode];
                 variant="outlined"
                 size="small"
                 startIcon={<VolumeUpIcon />}
-                onClick={() => sendNotification('测试通知', '这是一个测试通知', true)}
+                onClick={() => sendNotification('测试通知', '这是一个测试通知')}
                 sx={{ borderRadius: 3 }}
               >
                 测试通知
@@ -2327,7 +2413,10 @@ const displayIsRunning = isRunningForMode[mode];
       {/* 通知弹窗 */}
       <Dialog
         open={notificationDialog.open}
-        onClose={() => setNotificationDialog(prev => ({ ...prev, open: false }))}
+        onClose={() => {
+          setNotificationDialog(prev => ({ ...prev, open: false }));
+          executeModeSwitch();
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{
@@ -2350,7 +2439,10 @@ const displayIsRunning = isRunningForMode[mode];
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="contained"
-              onClick={() => setNotificationDialog(prev => ({ ...prev, open: false }))}
+              onClick={() => {
+                setNotificationDialog(prev => ({ ...prev, open: false }));
+                executeModeSwitch();
+              }}
               sx={{
                 borderRadius: 2,
                 bgcolor: modeColors[mode].primary,

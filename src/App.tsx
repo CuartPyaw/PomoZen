@@ -314,7 +314,7 @@ function App() {
 
           {/* 顶部 AppBar */}
           <AppBar position="static" elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
-            <Toolbar sx={{ justifyContent: 'center' }}>
+            <Toolbar sx={{ justifyContent: 'center', position: 'relative' }}>
               <Typography
                 variant="h4"
                 component="h1"
@@ -326,6 +326,36 @@ function App() {
               >
                 PomoZen
               </Typography>
+
+              {/* 主题切换按钮 - 右上角 */}
+              <Tooltip title={themePreference === 'light' ? '浅色模式' : themePreference === 'dark' ? '暗色模式' : '跟随系统'} arrow TransitionComponent={Zoom}>
+                <IconButton
+                  onClick={() => {
+                    const cycle = ['light', 'dark', 'system'];
+                    const currentIndex = cycle.indexOf(themePreference);
+                    const nextMode = cycle[(currentIndex + 1) % cycle.length];
+                    setThemePreference(nextMode as 'light' | 'dark' | 'system');
+                  }}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: 48,
+                    height: 48,
+                    color: 'text.secondary',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: themeColor.primary,
+                    },
+                  }}
+                  aria-label="切换主题"
+                >
+                  {themePreference === 'light' && <Brightness7Icon />}
+                  {themePreference === 'dark' && <Brightness4Icon />}
+                  {themePreference === 'system' && <BrightnessAutoIcon />}
+                </IconButton>
+              </Tooltip>
             </Toolbar>
           </AppBar>
 
@@ -658,9 +688,6 @@ function App() {
               onClose={() => settings.setShowSettings(false)}
               settings={settings}
               timer={timer}
-              themeMode={themeMode}
-              themePreference={themePreference}
-              setThemePreference={setThemePreference}
               onTestNotification={() => notifications.sendNotification('测试通知', '这是一个测试通知')}
             />
           )}
@@ -704,9 +731,6 @@ interface SettingsDialogProps {
   onClose: () => void;
   settings: ReturnType<typeof useSettings>;
   timer: ReturnType<typeof useTimer>;
-  themeMode: 'light' | 'dark';
-  themePreference: 'light' | 'dark' | 'system';
-  setThemePreference: (pref: 'light' | 'dark' | 'system') => void;
   onTestNotification: () => void;
 }
 
@@ -715,9 +739,6 @@ function SettingsDialog({
   onClose,
   settings,
   timer,
-  themeMode,
-  themePreference,
-  setThemePreference,
   onTestNotification,
 }: SettingsDialogProps) {
   const themeColor = MODE_COLORS[timer.mode];
@@ -825,58 +846,6 @@ function SettingsDialog({
           <Button variant="outlined" size="small" startIcon={<VolumeUpIcon />} onClick={onTestNotification} sx={{ borderRadius: 3 }}>
             测试通知
           </Button>
-        </Stack>
-
-        {/* 外观设置 */}
-        <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
-          🎨 外观设置
-        </Typography>
-        <Stack spacing={2} sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {themePreference === 'dark' ? <Brightness4Icon fontSize="small" /> :
-               themePreference === 'light' ? <Brightness7Icon fontSize="small" /> : <BrightnessAutoIcon fontSize="small" />}
-              <Typography variant="body2">
-                {themePreference === 'dark' ? '暗色模式' :
-                 themePreference === 'light' ? '浅色模式' : '跟随系统'}
-              </Typography>
-            </Box>
-            <ButtonGroup size="small" sx={{ bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', borderRadius: 2 }}>
-              <Button
-                onClick={() => setThemePreference('light')}
-                sx={{
-                  borderRadius: 2,
-                  bgcolor: themePreference === 'light' ? themeColor.primary : 'transparent',
-                  color: themePreference === 'light' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
-                  minWidth: 60,
-                }}
-              >
-                浅色
-              </Button>
-              <Button
-                onClick={() => setThemePreference('system')}
-                sx={{
-                  borderRadius: 2,
-                  bgcolor: themePreference === 'system' ? themeColor.primary : 'transparent',
-                  color: themePreference === 'system' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
-                  minWidth: 60,
-                }}
-              >
-                跟随
-              </Button>
-              <Button
-                onClick={() => setThemePreference('dark')}
-                sx={{
-                  borderRadius: 2,
-                  bgcolor: themePreference === 'dark' ? themeColor.primary : 'transparent',
-                  color: themePreference === 'dark' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
-                  minWidth: 60,
-                }}
-              >
-                暗色
-              </Button>
-            </ButtonGroup>
-          </Box>
         </Stack>
 
         {/* 循环模式说明 */}

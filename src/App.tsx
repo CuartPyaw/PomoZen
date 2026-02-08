@@ -115,6 +115,7 @@ const STORAGE_KEYS = {
   CHART_TIME_RANGE: 'tomato-chart-time-range',  // 图表时间范围
   CHART_DATA_METRIC: 'tomato-chart-data-metric', // 图表数据指标
   SOUND_ENABLED: 'tomato-soundEnabled',         // 通知声音开关
+  AUTO_SKIP_NOTIFICATION: 'tomato-autoSkipNotification', // 自动跳过通知开关
 } as const;
 
 // 组件定义
@@ -188,6 +189,16 @@ function App() {
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.SOUND_ENABLED);
     return saved !== 'false'; // 默认开启
+  });
+
+  /**
+   * 自动跳过通知开关
+   * 启用后，计时器完成时不显示通知弹窗
+   * @default false
+   */
+  const [autoSkipNotification, setAutoSkipNotification] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.AUTO_SKIP_NOTIFICATION);
+    return saved === 'true'; // 默认关闭
   });
 
   /**
@@ -751,6 +762,16 @@ function App() {
    * @param playSound - 是否播放声音（默认根据 soundEnabled 设置）
    */
   const sendNotification = (title: string, body: string, playSound?: boolean) => {
+    // 如果启用自动跳过通知，不显示弹窗
+    if (autoSkipNotification) {
+      // 播放声音（如果启用且未明确禁用）
+      const shouldPlaySound = playSound !== undefined ? playSound : soundEnabled;
+      if (shouldPlaySound) {
+        playNotificationSound();
+      }
+      return;
+    }
+
     // 清除之前的定时器，防止内存泄漏
     if (notificationTimeoutRef.current) {
       clearTimeout(notificationTimeoutRef.current);
@@ -1972,6 +1993,18 @@ const displayIsRunning = isRunningForMode[mode];
                   size="small"
                 />
               </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="body2">自动跳过通知</Typography>
+                <Switch
+                  checked={autoSkipNotification}
+                  onChange={(e) => {
+                    const newValue = e.target.checked;
+                    setAutoSkipNotification(newValue);
+                    localStorage.setItem(STORAGE_KEYS.AUTO_SKIP_NOTIFICATION, String(newValue));
+                  }}
+                  size="small"
+                />
+              </Box>
               <Button
                 variant="outlined"
                 size="small"
@@ -2314,6 +2347,20 @@ const displayIsRunning = isRunningForMode[mode];
           <Typography variant="body1" color="text.secondary">
             {notificationDialog.message}
           </Typography>
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={() => setNotificationDialog(prev => ({ ...prev, open: false }))}
+              sx={{
+                borderRadius: 2,
+                bgcolor: modeColors[mode].primary,
+                '&:hover': { bgcolor: modeColors[mode].bright },
+                minWidth: 80,
+              }}
+            >
+              知道了
+            </Button>
+          </Box>
         </DialogContent>
       </Dialog>
       </Box>

@@ -9,7 +9,7 @@
  * @version 2.0.0
  */
 
-import { useEffect, useRef, memo, useMemo } from 'react';
+import { useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import {
   Container,
   Box,
@@ -30,10 +30,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   Tooltip,
   Zoom,
   ThemeProvider,
+  alpha,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
@@ -47,6 +52,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import BrightnessAutoIcon from '@mui/icons-material/BrightnessAuto';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import type { TimerMode } from './types/worker';
@@ -716,10 +722,21 @@ function SettingsDialog({
 }: SettingsDialogProps) {
   const themeColor = MODE_COLORS[timer.mode];
 
+  // 关闭前检查是否有未保存的更改
+  const handleClose = useCallback(() => {
+    if (settings.hasUnsavedChanges) {
+      if (window.confirm('您有未保存的设置更改，确定要关闭吗？')) {
+        onClose();
+      }
+    } else {
+      onClose();
+    }
+  }, [settings.hasUnsavedChanges, onClose]);
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{ sx: { borderRadius: 4 } }}
@@ -746,7 +763,7 @@ function SettingsDialog({
             size="small"
             InputProps={{ endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography> }}
             inputProps={{ min: 1, max: 120 }}
-            value={settings.customFocusTime / 60}
+            value={settings.tempSettings.customFocusTime / 60}
             onChange={(e) => settings.handleTimeChange('focus', parseInt(e.target.value) || 25)}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
           />
@@ -757,7 +774,7 @@ function SettingsDialog({
             size="small"
             InputProps={{ endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography> }}
             inputProps={{ min: 1, max: 120 }}
-            value={settings.customBreakTime / 60}
+            value={settings.tempSettings.customBreakTime / 60}
             onChange={(e) => settings.handleTimeChange('break', parseInt(e.target.value) || 5)}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
           />
@@ -768,7 +785,7 @@ function SettingsDialog({
             size="small"
             InputProps={{ endAdornment: <Typography variant="body2" color="text.secondary">分钟</Typography> }}
             inputProps={{ min: 1, max: 120 }}
-            value={settings.customLongBreakTime / 60}
+            value={settings.tempSettings.customLongBreakTime / 60}
             onChange={(e) => settings.handleTimeChange('longBreak', parseInt(e.target.value) || 30)}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
           />
@@ -781,11 +798,11 @@ function SettingsDialog({
         <Stack spacing={2} sx={{ mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="body2">启用自动切换模式</Typography>
-            <Switch checked={settings.autoSwitch} onChange={(e) => settings.toggleAutoSwitch(e.target.checked)} size="small" />
+            <Switch checked={settings.tempSettings.autoSwitch} onChange={(e) => settings.updateTempSwitch('autoSwitch', e.target.checked)} size="small" />
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="body2">自动切换时自动开始计时</Typography>
-            <Switch checked={settings.autoStart} onChange={(e) => settings.toggleAutoStart(e.target.checked)} size="small" />
+            <Switch checked={settings.tempSettings.autoStart} onChange={(e) => settings.updateTempSwitch('autoStart', e.target.checked)} size="small" />
           </Box>
         </Stack>
 
@@ -796,14 +813,14 @@ function SettingsDialog({
         <Stack spacing={2} sx={{ mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {settings.soundEnabled ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
+              {settings.tempSettings.soundEnabled ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
               <Typography variant="body2">启用通知声音</Typography>
             </Box>
-            <Switch checked={settings.soundEnabled} onChange={(e) => settings.toggleSoundEnabled(e.target.checked)} size="small" />
+            <Switch checked={settings.tempSettings.soundEnabled} onChange={(e) => settings.updateTempSwitch('soundEnabled', e.target.checked)} size="small" />
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="body2">自动跳过通知</Typography>
-            <Switch checked={settings.autoSkipNotification} onChange={(e) => settings.toggleAutoSkipNotification(e.target.checked)} size="small" />
+            <Switch checked={settings.tempSettings.autoSkipNotification} onChange={(e) => settings.updateTempSwitch('autoSkipNotification', e.target.checked)} size="small" />
           </Box>
           <Button variant="outlined" size="small" startIcon={<VolumeUpIcon />} onClick={onTestNotification} sx={{ borderRadius: 3 }}>
             测试通知
@@ -863,7 +880,7 @@ function SettingsDialog({
         </Stack>
 
         {/* 循环模式说明 */}
-        {settings.autoSwitch && (
+        {settings.tempSettings.autoSwitch && (
           <Card variant="outlined" sx={{ mt: 2, borderRadius: 3, bgcolor: 'action.hover' }}>
             <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
               <Typography variant="body2" fontWeight={600} gutterBottom>
@@ -879,27 +896,113 @@ function SettingsDialog({
           </Card>
         )}
 
-        {/* 清除缓存 */}
+        {/* 高级功能 - 调试 */}
+        {settings.tempSettings.autoSwitch && (
+          <Accordion
+            defaultExpanded={false}
+            sx={{
+              boxShadow: 'none',
+              '&:before': { display: 'none' },
+              mt: 3,
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                '& .MuiAccordionSummary-content': {
+                  margin: 0,
+                  py: 1,
+                },
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ color: themeColor.primary, fontWeight: 600 }}>
+                高级功能
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: 0 }}>
+              <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: 'action.hover' }}>
+                <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      快速设置当前番茄周期
+                    </Typography>
+                    <Switch
+                      checked={settings.debugModeEnabled || false}
+                      onChange={(e) => settings.toggleDebugMode?.(e.target.checked)}
+                      size="small"
+                    />
+                  </Box>
+                  {settings.debugModeEnabled && (
+                    <>
+                      <Typography variant="caption" color="error.main" sx={{ display: 'block', mb: 1.5, fontWeight: 500 }}>
+                        ⚠️ 警告：此功能仅用于测试，手动修改周期可能导致计时逻辑异常
+                      </Typography>
+                      <ButtonGroup variant="outlined" size="small" fullWidth>
+                        {[1, 2, 3, 4, 5].map((num) => (
+                          <Button
+                            key={num}
+                            onClick={() => timer.setPomodoroCycle(num)}
+                            sx={{
+                              borderColor: timer.pomodoroCycle === num ? themeColor.primary : 'divider',
+                              bgcolor: timer.pomodoroCycle === num ? alpha(themeColor.primary, 0.1) : 'transparent',
+                              color: timer.pomodoroCycle === num ? themeColor.primary : 'text.primary',
+                            }}
+                          >
+                            {num}
+                          </Button>
+                        ))}
+                      </ButtonGroup>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        {/* 清除数据 */}
         <Typography variant="subtitle2" sx={{ mb: 2, mt: 3, color: themeColor.primary, fontWeight: 600 }}>
           🗑️ 数据管理
         </Typography>
         <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: 'action.hover' }}>
           <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              清除所有本地缓存数据，包括设置、统计记录和历史数据
+              清除统计记录和历史数据（设置不受影响）
             </Typography>
             <Button
               variant="outlined"
               fullWidth
               size="small"
-              onClick={settings.handleClearCache}
+              onClick={settings.handleClearData}
               sx={{ borderRadius: 3, borderColor: 'error.main', color: 'error.main', '&:hover': { bgcolor: 'error.main', color: '#ffffff' } }}
             >
-              清除所有缓存
+              清除数据
             </Button>
           </CardContent>
         </Card>
       </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+        <Button
+          onClick={settings.handleResetSettings}
+          color="error"
+          variant="outlined"
+          sx={{ borderRadius: 3 }}
+        >
+          重置设置
+        </Button>
+        <Button
+          onClick={settings.handleSaveSettings}
+          variant="contained"
+          disabled={!settings.hasUnsavedChanges}
+          sx={{
+            borderRadius: 3,
+            bgcolor: settings.hasUnsavedChanges ? themeColor.primary : 'action.disabled',
+            color: '#ffffff',
+          }}
+        >
+          保存
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

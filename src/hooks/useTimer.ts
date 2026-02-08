@@ -281,16 +281,16 @@ export function useTimer(
     let nextMode: TimerMode;
 
     if (mode === 'focus') {
-      nextMode = 'break';
+      nextMode = pomodoroCycle >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'break';
     } else if (mode === 'break') {
-      nextMode = pomodoroCycle >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'focus';
+      nextMode = 'focus';
     } else {
       nextMode = 'focus';
     }
 
     if (mode === 'longBreak') {
       setPomodoroCycle(1);
-    } else if (mode === 'break') {
+    } else if (mode === 'focus') {
       setPomodoroCycle((prev) => prev + 1);
     }
 
@@ -380,16 +380,16 @@ export function useTimer(
       let nextMode: TimerMode;
 
       if (completedMode === 'focus') {
-        nextMode = 'break';
+        nextMode = pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'break';
       } else if (completedMode === 'break') {
-        nextMode = pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'focus';
+        nextMode = 'focus';
       } else {
         nextMode = 'focus';
       }
 
       if (completedMode === 'longBreak') {
         setPomodoroCycle(1);
-      } else if (completedMode === 'break') {
+      } else if (completedMode === 'focus') {
         setPomodoroCycle((prev) => prev + 1);
       }
 
@@ -436,16 +436,16 @@ export function useTimer(
     let nextMode: TimerMode;
 
     if (lastCompletedMode === 'focus') {
-      nextMode = 'break';
+      nextMode = pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'break';
     } else if (lastCompletedMode === 'break') {
-      nextMode = pomodoroCycleRef.current >= POMODORO_CYCLE_COUNT ? 'longBreak' : 'focus';
+      nextMode = 'focus';
     } else {
       nextMode = 'focus';
     }
 
     if (lastCompletedMode === 'longBreak') {
       setPomodoroCycle(1);
-    } else if (lastCompletedMode === 'break') {
+    } else if (lastCompletedMode === 'focus') {
       setPomodoroCycle((prev) => prev + 1);
     }
 

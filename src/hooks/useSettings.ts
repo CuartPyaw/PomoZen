@@ -5,7 +5,7 @@
  * @module hooks/useSettings
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { StorageManager } from '../utils/storage';
 import { Logger } from '../utils/logger';
 
@@ -18,6 +18,7 @@ const STORAGE_KEYS = {
   CUSTOM_LONG_BREAK_TIME: 'tomato-customLongBreakTime',
   SOUND_ENABLED: 'tomato-soundEnabled',
   AUTO_SKIP_NOTIFICATION: 'tomato-autoSkipNotification',
+  DEBUG_MODE_ENABLED: 'tomato-debugModeEnabled',
 } as const;
 
 // 默认值配置
@@ -29,6 +30,7 @@ const DEFAULTS = {
   AUTO_START: true,
   SOUND_ENABLED: true,
   AUTO_SKIP_NOTIFICATION: false,
+  DEBUG_MODE_ENABLED: false,
 } as const;
 
 /**
@@ -68,6 +70,11 @@ export function useSettings() {
   // 设置面板显示状态
   const [showSettings, setShowSettings] = useState(false);
 
+  // 调试模式开关
+  const [debugModeEnabled, setDebugModeEnabled] = useState(() =>
+    loadBooleanSetting(STORAGE_KEYS.DEBUG_MODE_ENABLED, DEFAULTS.DEBUG_MODE_ENABLED)
+  );
+
   // 自动切换模式开关
   const [autoSwitch, setAutoSwitch] = useState(() =>
     loadBooleanSetting(STORAGE_KEYS.AUTO_SWITCH, DEFAULTS.AUTO_SWITCH)
@@ -103,55 +110,120 @@ export function useSettings() {
     loadTimeSetting(STORAGE_KEYS.CUSTOM_LONG_BREAK_TIME, DEFAULTS.LONG_BREAK_TIME)
   );
 
+  // 临时状态（用于未保存的修改）
+  const [tempSettings, setTempSettings] = useState({
+    customFocusTime: customFocusTime,
+    customBreakTime: customBreakTime,
+    customLongBreakTime: customLongBreakTime,
+    autoSwitch: autoSwitch,
+    autoStart: autoStart,
+    soundEnabled: soundEnabled,
+    autoSkipNotification: autoSkipNotification,
+  });
+
+  // 是否有未保存的修改
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // 同步临时状态
+  useEffect(() => {
+    setTempSettings({
+      customFocusTime,
+      customBreakTime,
+      customLongBreakTime,
+      autoSwitch,
+      autoStart,
+      soundEnabled,
+      autoSkipNotification,
+    });
+  }, [customFocusTime, customBreakTime, customLongBreakTime, autoSwitch, autoStart, soundEnabled, autoSkipNotification]);
+
   /**
-   * 处理时间设置变化
+   * 处理时间设置变化（只更新临时状态）
    * @param timeType 时间类型
    * @param minutes 新的时间（分钟）
    */
   const handleTimeChange = useCallback((timeType: 'focus' | 'break' | 'longBreak', minutes: number) => {
     const newTime = Math.max(1, Math.min(120, minutes)) * 60;
 
-    const setterMap = {
-      focus: setCustomFocusTime,
-      break: setCustomBreakTime,
-      longBreak: setCustomLongBreakTime,
-    };
     const keyMap = {
-      focus: STORAGE_KEYS.CUSTOM_FOCUS_TIME,
-      break: STORAGE_KEYS.CUSTOM_BREAK_TIME,
-      longBreak: STORAGE_KEYS.CUSTOM_LONG_BREAK_TIME,
+      focus: 'customFocusTime' as const,
+      break: 'customBreakTime' as const,
+      longBreak: 'customLongBreakTime' as const,
     };
 
-    setterMap[timeType](newTime);
+    setTempSettings(prev => ({ ...prev, [keyMap[timeType]]: newTime }));
+    setHasUnsavedChanges(true);
+  }, []);
 
-    try {
-      StorageManager.set(keyMap[timeType], newTime);
-      Logger.debug(`Time setting updated: ${timeType} = ${newTime}s`);
-    } catch (error) {
-      Logger.error(`Failed to save time setting: ${timeType}`, error);
+  /**
+   * 清除数据（只清除统计和历史，保留设置）
+   */
+  const handleClearData = useCallback(() => {
+    if (window.confirm('确定要清除所有数据吗？这将删除统计记录和历史数据，但保留设置。')) {
+      try {
+        // 只清除数据相关的键，保留设置
+        const dataKeys = [
+          'tomato-statistics',
+          'tomato-dailyRecords',
+          'tomato-hourlyData',
+        ];
+        dataKeys.forEach(key => {
+          StorageManager.remove(key);
+        });
+        Logger.info('Data cleared successfully');
+        // 重新加载页面以重新初始化统计
+        window.location.reload();
+      } catch (error) {
+        Logger.error('Failed to clear data', error);
+      }
     }
   }, []);
 
   /**
-   * 清除所有缓存
+   * 保存设置到 localStorage
    */
-  const handleClearCache = useCallback(() => {
-    if (window.confirm('确定要清除所有缓存吗？这将删除所有设置和数据，此操作不可撤销。')) {
-      try {
-        StorageManager.clear('tomato-');
-        Logger.info('All cache cleared successfully');
+  const handleSaveSettings = useCallback(() => {
+    try {
+      StorageManager.set(STORAGE_KEYS.CUSTOM_FOCUS_TIME, tempSettings.customFocusTime);
+      StorageManager.set(STORAGE_KEYS.CUSTOM_BREAK_TIME, tempSettings.customBreakTime);
+      StorageManager.set(STORAGE_KEYS.CUSTOM_LONG_BREAK_TIME, tempSettings.customLongBreakTime);
+      StorageManager.set(STORAGE_KEYS.AUTO_SWITCH, tempSettings.autoSwitch);
+      StorageManager.set(STORAGE_KEYS.AUTO_START, tempSettings.autoStart);
+      StorageManager.set(STORAGE_KEYS.SOUND_ENABLED, tempSettings.soundEnabled);
+      StorageManager.set(STORAGE_KEYS.AUTO_SKIP_NOTIFICATION, tempSettings.autoSkipNotification);
+      StorageManager.set(STORAGE_KEYS.DEBUG_MODE_ENABLED, debugModeEnabled);
 
-        // 重置所有状态为默认值
-        setCustomFocusTime(DEFAULTS.FOCUS_TIME);
-        setCustomBreakTime(DEFAULTS.BREAK_TIME);
-        setCustomLongBreakTime(DEFAULTS.LONG_BREAK_TIME);
-        setAutoSwitch(DEFAULTS.AUTO_SWITCH);
-        setAutoStart(DEFAULTS.AUTO_START);
-        setSoundEnabled(DEFAULTS.SOUND_ENABLED);
-        setAutoSkipNotification(DEFAULTS.AUTO_SKIP_NOTIFICATION);
-      } catch (error) {
-        Logger.error('Failed to clear cache', error);
-      }
+      // 更新实际状态
+      setCustomFocusTime(tempSettings.customFocusTime);
+      setCustomBreakTime(tempSettings.customBreakTime);
+      setCustomLongBreakTime(tempSettings.customLongBreakTime);
+      setAutoSwitch(tempSettings.autoSwitch);
+      setAutoStart(tempSettings.autoStart);
+      setSoundEnabled(tempSettings.soundEnabled);
+      setAutoSkipNotification(tempSettings.autoSkipNotification);
+
+      setHasUnsavedChanges(false);
+      Logger.info('Settings saved successfully');
+    } catch (error) {
+      Logger.error('Failed to save settings', error);
+    }
+  }, [tempSettings, debugModeEnabled]);
+
+  /**
+   * 重置设置为默认值
+   */
+  const handleResetSettings = useCallback(() => {
+    if (window.confirm('确定要重置所有设置为默认值吗？此操作不会清除统计数据。')) {
+      setTempSettings({
+        customFocusTime: DEFAULTS.FOCUS_TIME,
+        customBreakTime: DEFAULTS.BREAK_TIME,
+        customLongBreakTime: DEFAULTS.LONG_BREAK_TIME,
+        autoSwitch: DEFAULTS.AUTO_SWITCH,
+        autoStart: DEFAULTS.AUTO_START,
+        soundEnabled: DEFAULTS.SOUND_ENABLED,
+        autoSkipNotification: DEFAULTS.AUTO_SKIP_NOTIFICATION,
+      });
+      setHasUnsavedChanges(true);
     }
   }, []);
 
@@ -203,6 +275,26 @@ export function useSettings() {
     }
   }, []);
 
+  /**
+   * 切换调试模式
+   */
+  const toggleDebugMode = useCallback((value: boolean) => {
+    setDebugModeEnabled(value);
+    try {
+      StorageManager.set(STORAGE_KEYS.DEBUG_MODE_ENABLED, value);
+    } catch (error) {
+      Logger.error('Failed to save debugModeEnabled setting', error);
+    }
+  }, []);
+
+  /**
+   * 更新临时设置的开关值
+   */
+  const updateTempSwitch = useCallback((key: keyof typeof tempSettings, value: boolean) => {
+    setTempSettings(prev => ({ ...prev, [key]: value }));
+    setHasUnsavedChanges(true);
+  }, []);
+
   return {
     // 状态
     showSettings,
@@ -214,12 +306,20 @@ export function useSettings() {
     customFocusTime,
     customBreakTime,
     customLongBreakTime,
+    debugModeEnabled,
+    tempSettings,
+    hasUnsavedChanges,
     // 方法
     handleTimeChange,
-    handleClearCache,
+    handleClearData,
+    handleSaveSettings,
+    handleResetSettings,
     toggleAutoSwitch,
     toggleAutoStart,
     toggleSoundEnabled,
     toggleAutoSkipNotification,
+    toggleDebugMode,
+    updateTempSwitch,
+    setDebugModeEnabled,
   };
 }

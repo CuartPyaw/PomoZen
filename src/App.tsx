@@ -1922,17 +1922,17 @@ const displayIsRunning = isRunningForMode[mode];
         {/* 快捷键、专注统计、运行状态横向排布 */}
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           {/* 键盘快捷键提示 */}
-          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <KeyboardIcon sx={{ color: '#2C2C2C', fontSize: 18 }} />
-                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
+                <KeyboardIcon sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontSize: 18 }} />
+                <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontWeight: 500 }}>
                   快捷键
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: 'rgba(44,44,44,0.1)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(44,44,44,0.08)' }} />
-                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: 'rgba(44,44,44,0.1)', color: '#2C2C2C', fontSize: '0.75rem', border: '1px solid rgba(44,44,44,0.08)' }} />
+                <Chip label="空格 开始/暂停" size="small" sx={{ bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)', color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontSize: '0.75rem', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)' }} />
+                <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)', color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontSize: '0.75rem', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)' }} />
               </Box>
             </CardContent>
           </Card>
@@ -1942,15 +1942,15 @@ const displayIsRunning = isRunningForMode[mode];
             elevation={0}
             sx={{
               borderRadius: 4,
-              bgcolor: 'rgba(44,44,44,0.03)',
+              bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)',
               backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(44,44,44,0.08)',
+              border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
               flex: 1,
               minWidth: { xs: '100%', sm: '200px' },
               cursor: 'pointer',
               transition: 'transform 0.2s ease, border-color 0.2s ease',
               '&:hover': {
-                borderColor: 'rgba(255,255,255,0.12)',
+                borderColor: themeMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.12)',
                 transform: 'translateY(-2px)',
               }
             }}
@@ -1959,7 +1959,7 @@ const displayIsRunning = isRunningForMode[mode];
             <CardContent sx={{ py: 2 }}>
               {/* 第一行：标题居中 */}
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontWeight: 500 }}>
                   📊 专注统计
                 </Typography>
               </Box>
@@ -1972,7 +1972,7 @@ const displayIsRunning = isRunningForMode[mode];
                     bgcolor: modeColors.focus.primary,
                     color: '#ffffff',
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(44,44,44,0.08)',
+                    border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
                     fontWeight: 500,
                   }}
                 />
@@ -1995,10 +1995,10 @@ const displayIsRunning = isRunningForMode[mode];
           </Card>
 
           {/* 运行状态面板 */}
-          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+          <Card elevation={0} sx={{ borderRadius: 4, bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
             <CardContent sx={{ py: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <Typography variant="body2" sx={{ color: '#2C2C2C', fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontWeight: 500 }}>
                   运行状态
                 </Typography>
               </Box>
@@ -2007,30 +2007,30 @@ const displayIsRunning = isRunningForMode[mode];
                   label={isRunningForMode.focus ? '专注运行中' : '专注停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : 'rgba(44,44,44,0.1)',
-                    color: isRunningForMode.focus ? '#ffffff' : '#2C2C2C',
+                    bgcolor: isRunningForMode.focus ? modeColors.focus.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                    color: isRunningForMode.focus ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(44,44,44,0.08)',
+                    border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
                 <Chip
                   label={isRunningForMode.break ? '短休息运行中' : '短休息停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.break ? modeColors.break.primary : 'rgba(44,44,44,0.1)',
-                    color: isRunningForMode.break ? '#ffffff' : '#2C2C2C',
+                    bgcolor: isRunningForMode.break ? modeColors.break.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                    color: isRunningForMode.break ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(44,44,44,0.08)',
+                    border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
                 <Chip
                   label={isRunningForMode.longBreak ? '长休息运行中' : '长休息停止'}
                   size="small"
                   sx={{
-                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : 'rgba(44,44,44,0.1)',
-                    color: isRunningForMode.longBreak ? '#ffffff' : '#2C2C2C',
+                    bgcolor: isRunningForMode.longBreak ? modeColors.longBreak.primary : (themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)'),
+                    color: isRunningForMode.longBreak ? '#ffffff' : (themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C'),
                     fontSize: '0.75rem',
-                    border: '1px solid rgba(44,44,44,0.08)',
+                    border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
                   }}
                 />
               </Box>

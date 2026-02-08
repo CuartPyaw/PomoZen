@@ -45,8 +45,11 @@ import PauseIcon from '@mui/icons-material/Pause';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import BrightnessAutoIcon from '@mui/icons-material/BrightnessAuto';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createZenTheme } from './theme';
+import { createZenTheme, type ThemeMode } from './theme';
 import type {
   DailyFocusRecord,
   ChartViewMode,
@@ -75,6 +78,14 @@ import './styles/background.css';
  * - longBreak: 长休息模式
  */
 type TimerMode = 'focus' | 'break' | 'longBreak';
+
+/**
+ * 主题模式偏好类型
+ * - light: 浅色模式
+ * - dark: 暗色模式
+ * - system: 跟随系统设置
+ */
+type ThemeModePreference = 'light' | 'dark' | 'system';
 
 // 常量配置
 
@@ -116,6 +127,7 @@ const STORAGE_KEYS = {
   CHART_DATA_METRIC: 'tomato-chart-data-metric', // 图表数据指标
   SOUND_ENABLED: 'tomato-soundEnabled',         // 通知声音开关
   AUTO_SKIP_NOTIFICATION: 'tomato-autoSkipNotification', // 自动跳过通知开关
+  THEME_MODE: 'tomato-theme-mode',              // 主题模式偏好
 } as const;
 
 // 组件定义
@@ -140,6 +152,33 @@ function App() {
    * @default 'focus'
    */
   const [mode, setMode] = useState<TimerMode>('focus');
+
+  /**
+   * 获取系统主题偏好
+   */
+  const getSystemTheme = (): ThemeMode => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  /**
+   * 主题模式偏好（用户选择）
+   * @default 'system'
+   */
+  const [themePreference, setThemePreference] = useState<ThemeModePreference>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME_MODE);
+    if (saved === 'light' || saved === 'dark' || saved === 'system') return saved as ThemeModePreference;
+    return 'system'; // 默认跟随系统
+  });
+
+  /**
+   * 实际应用的主题模式
+   */
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME_MODE);
+    if (saved === 'light') return 'light';
+    if (saved === 'dark') return 'dark';
+    return getSystemTheme(); // system 或默认
+  });
 
   /**
    * 设置面板显示状态
@@ -427,6 +466,48 @@ function App() {
     autoSkipNotificationRef.current = autoSkipNotification;
     soundEnabledRef.current = soundEnabled;
   }, [autoSkipNotification, soundEnabled]);
+
+  /**
+   * 同步主题模式到根元素和 localStorage
+   */
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', themeMode);
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME_MODE, themePreference);
+    } catch (error) {
+      console.error('Failed to save theme mode:', error);
+    }
+  }, [themeMode, themePreference]);
+
+  /**
+   * 监听系统主题变化
+   * 当用户选择「跟随系统」时，自动切换主题
+   */
+  useEffect(() => {
+    if (themePreference !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setThemeMode(e.matches ? 'dark' : 'light');
+    };
+
+    // 立即设置当前系统主题
+    setThemeMode(getSystemTheme());
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [themePreference]);
+
+  /**
+   * 处理主题偏好变化
+   */
+  useEffect(() => {
+    if (themePreference === 'system') {
+      setThemeMode(getSystemTheme());
+    } else {
+      setThemeMode(themePreference);
+    }
+  }, [themePreference]);
 
   /**
    * 初始化计时器 Worker
@@ -1624,7 +1705,7 @@ const displayIsRunning = isRunningForMode[mode];
   const themeColor = modeColors[mode];
 
   return (
-    <ThemeProvider theme={createZenTheme()}>
+    <ThemeProvider theme={createZenTheme(themeMode)}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* 背景系统 */}
@@ -2116,6 +2197,59 @@ const displayIsRunning = isRunningForMode[mode];
               >
                 测试通知
               </Button>
+            </Stack>
+
+            {/* 外观设置部分 */}
+            <Typography variant="subtitle2" sx={{ mb: 2, color: themeColor.primary, fontWeight: 600 }}>
+              🎨 外观设置
+            </Typography>
+
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {themePreference === 'dark' ? <Brightness4Icon fontSize="small" /> :
+                   themePreference === 'light' ? <Brightness7Icon fontSize="small" /> : <BrightnessAutoIcon fontSize="small" />}
+                  <Typography variant="body2">
+                    {themePreference === 'dark' ? '暗色模式' :
+                     themePreference === 'light' ? '浅色模式' : '跟随系统'}
+                  </Typography>
+                </Box>
+                <ButtonGroup size="small" sx={{ bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', borderRadius: 2 }}>
+                  <Button
+                    onClick={() => setThemePreference('light')}
+                    sx={{
+                      borderRadius: 2,
+                      bgcolor: themePreference === 'light' ? themeColor.primary : 'transparent',
+                      color: themePreference === 'light' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
+                      minWidth: 60,
+                    }}
+                  >
+                    浅色
+                  </Button>
+                  <Button
+                    onClick={() => setThemePreference('system')}
+                    sx={{
+                      borderRadius: 2,
+                      bgcolor: themePreference === 'system' ? themeColor.primary : 'transparent',
+                      color: themePreference === 'system' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
+                      minWidth: 60,
+                    }}
+                  >
+                    跟随
+                  </Button>
+                  <Button
+                    onClick={() => setThemePreference('dark')}
+                    sx={{
+                      borderRadius: 2,
+                      bgcolor: themePreference === 'dark' ? themeColor.primary : 'transparent',
+                      color: themePreference === 'dark' ? '#ffffff' : (themeMode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(44,44,44,0.6)'),
+                      minWidth: 60,
+                    }}
+                  >
+                    暗色
+                  </Button>
+                </ButtonGroup>
+              </Box>
             </Stack>
 
             {/* 循环模式说明 */}

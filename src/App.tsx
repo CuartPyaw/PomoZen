@@ -9,7 +9,7 @@
  * @version 2.0.0
  */
 
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useMemo } from 'react';
 import {
   Container,
   Box,
@@ -64,6 +64,8 @@ import { useSettings } from './hooks/useSettings';
 import { useStatistics } from './hooks/useStatistics';
 import { useNotifications } from './hooks/useNotifications';
 import { useTimer } from './hooks/useTimer';
+
+import { Logger } from './utils/logger';
 
 import './styles/background.css';
 
@@ -228,23 +230,8 @@ function App() {
   };
 
   /**
-   * 获取当前模式对应的总时长
+   * 获取当前模式的中文标签
    */
-  const getTotalTime = (): number => {
-    if (timer.mode === 'focus') return timer.getFocusTime();
-    if (timer.mode === 'break') return timer.getBreakTime();
-    return timer.getLongBreakTime();
-  };
-
-  /**
-   * 计算 SVG 环形进度条的参数
-   */
-  const getProgressParams = () => {
-    const circumference = 2 * Math.PI * TIMER_CIRCLE_CONFIG.RADIUS;
-    const progress = timer.timeLeftForMode[timer.mode] / getTotalTime();
-    const offset = circumference * (1 - progress);
-    return { circumference, offset };
-  };
 
   /**
    * 获取当前模式的中文标签
@@ -271,8 +258,36 @@ function App() {
 
   const displayTime = timer.timeLeftForMode[timer.mode];
   const displayIsRunning = timer.isRunningForMode[timer.mode];
-  const { circumference, offset } = getProgressParams();
   const themeColor = MODE_COLORS[timer.mode];
+
+  // 使用 useMemo 确保环形进度在时间变化时重新计算
+  const { circumference, offset } = useMemo(() => {
+    const totalTime = timer.mode === 'focus' ? timer.getFocusTime()
+      : timer.mode === 'break' ? timer.getBreakTime()
+      : timer.getLongBreakTime();
+    const timeLeft = timer.timeLeftForMode[timer.mode];
+
+    // 边界检查
+    if (totalTime <= 0) {
+      Logger.error('Total time is invalid', { totalTime, mode: timer.mode });
+      return { circumference: 2 * Math.PI * TIMER_CIRCLE_CONFIG.RADIUS, offset: 2 * Math.PI * TIMER_CIRCLE_CONFIG.RADIUS };
+    }
+
+    const circumference = 2 * Math.PI * TIMER_CIRCLE_CONFIG.RADIUS;
+    const progress = Math.max(0, Math.min(1, timeLeft / totalTime));
+    const offset = circumference * (1 - progress);
+
+    // 调试日志
+    Logger.debug('Ring progress calculated', {
+      mode: timer.mode,
+      timeLeft,
+      totalTime,
+      progress: progress.toFixed(3),
+      offset: offset.toFixed(2)
+    });
+
+    return { circumference, offset };
+  }, [timer.mode, timer.timeLeftForMode[timer.mode], timer.getFocusTime, timer.getBreakTime, timer.getLongBreakTime]);
 
   // ==================== JSX 渲染 ====================
 

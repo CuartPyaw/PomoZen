@@ -30,16 +30,11 @@ function postMessage(message: WorkerMessage): void {
 }
 
 /**
- * 开始指定模式的计时
+ * 创建计时器间隔
+ * @param mode 计时器模式
+ * @param logCompletion 是否在完成时记录日志
  */
-function startTimer(mode: TimerMode, initialTime: number): void {
-  states[mode].timeLeft = initialTime;
-  states[mode].isRunning = true;
-
-  if (intervalIds[mode] !== null) {
-    clearInterval(intervalIds[mode]);
-  }
-
+function createTimerInterval(mode: TimerMode, logCompletion: boolean = false): void {
   intervalIds[mode] = setInterval(() => {
     states[mode].timeLeft--;
 
@@ -50,11 +45,27 @@ function startTimer(mode: TimerMode, initialTime: number): void {
     });
 
     if (states[mode].timeLeft === 0) {
-      console.log(`=== Worker: Timer ${mode} reached zero, sending COMPLETE ===`);
+      if (logCompletion) {
+        console.log(`=== Worker: Timer ${mode} completed ===`);
+      }
       stopTimer(mode);
       postMessage({ type: 'COMPLETE', mode });
     }
   }, 1000);
+}
+
+/**
+ * 开始指定模式的计时
+ */
+function startTimer(mode: TimerMode, initialTime: number): void {
+  states[mode].timeLeft = initialTime;
+  states[mode].isRunning = true;
+
+  if (intervalIds[mode] !== null) {
+    clearInterval(intervalIds[mode]);
+  }
+
+  createTimerInterval(mode, true);
 }
 
 /**
@@ -74,20 +85,7 @@ function pauseTimer(mode: TimerMode): void {
 function resumeTimer(mode: TimerMode): void {
   if (states[mode].timeLeft > 0) {
     states[mode].isRunning = true;
-    intervalIds[mode] = setInterval(() => {
-      states[mode].timeLeft--;
-
-      postMessage({
-        type: 'UPDATE',
-        mode,
-        timeLeft: states[mode].timeLeft,
-      });
-
-      if (states[mode].timeLeft === 0) {
-        stopTimer(mode);
-        postMessage({ type: 'COMPLETE', mode });
-      }
-    }, 1000);
+    createTimerInterval(mode, false);
   }
 }
 
@@ -146,7 +144,8 @@ self.onmessage = (e: MessageEvent<WorkerCommand>): void => {
       break;
 
     default:
-      console.error('Unknown command:', command);
+      const unknownCmd = command as { type: string };
+      console.error(`[Worker Error] Unknown command: ${unknownCmd.type}`);
   }
 };
 

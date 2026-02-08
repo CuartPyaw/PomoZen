@@ -128,13 +128,17 @@ export function useTimer(
   // 模式切换定时器引用
   const switchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // onComplete 回调引用（用于避免 Worker 重新创建）
+  const onCompleteRef = useRef(onComplete);
+
   /**
    * 同步更新 ref
    */
   useEffect(() => {
     currentModeRef.current = mode;
     pomodoroCycleRef.current = pomodoroCycle;
-  }, [mode, pomodoroCycle]);
+    onCompleteRef.current = onComplete;
+  }, [mode, pomodoroCycle, onComplete]);
 
   /**
    * 保存运行状态到 localStorage
@@ -164,7 +168,6 @@ export function useTimer(
     worker.onmessage = (e: MessageEvent) => {
       const data = e.data as WorkerMessage;
       const { type, mode: msgMode } = data;
-      console.log('[Main] Worker message received:', data);
 
       if (type === 'UPDATE') {
         setIsRunningForMode((prev) => ({ ...prev, [msgMode]: true }));
@@ -183,14 +186,14 @@ export function useTimer(
       } else if (type === 'COMPLETE') {
         Logger.debug('Worker COMPLETE message received', { mode: msgMode, currentMode: currentModeRef.current, completedDuration: data.completedDuration });
         setIsRunningForMode((prev) => ({ ...prev, [msgMode]: false }));
-        onComplete(msgMode, data.completedDuration);
+        onCompleteRef.current(msgMode, data.completedDuration);
       }
     };
 
     return () => {
       worker.terminate();
     };
-  }, [onComplete]);
+  }, []);
 
   /**
    * 清理定时器

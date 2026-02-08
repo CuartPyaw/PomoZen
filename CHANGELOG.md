@@ -1,5 +1,20 @@
 # 开发日志
 
+## 2026-02-08
+
+### Bug 修复
+
+#### 1. 通知系统闭包陷阱修复
+- **问题**: "自动跳过通知"和"通知声音"设置无效，开关状态变化后不生效
+- **根因**: React 闭包陷阱 - `sendNotification` 和 `handleTimerComplete` 函数在 worker 消息回调中捕获了创建时的状态值，而非最新值
+- **修复**: 使用 `useRef` 存储状态的最新值，确保函数始终访问到最新的设置
+  - 添加 `autoSkipNotificationRef` 和 `soundEnabledRef`
+  - 通过 useEffect 同步状态到 ref
+  - 更新 `sendNotification` 和 `handleTimerComplete` 使用 ref 值
+- **影响文件**: `src/App.tsx`
+
+---
+
 ## 2026-02-06
 
 ### 新增功能

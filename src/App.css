@@ -4,14 +4,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 使用禅意主题宣纸色系背景 */
+  background: transparent;
 }
 
 .container {
-  background: white;
-  border-radius: 20px;
+  background: var(--zen-surface-elevated, #F5F2EB);
+  border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  /* 使用禅意主题阴影系统 */
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 4px 12px rgba(44,44,44,0.12);
   text-align: center;
   max-width: 400px;
   width: 90%;
@@ -29,28 +31,32 @@
 
 .settings-button {
   position: fixed;
-  left: 20px;
-  bottom: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  font-size: 1.5rem;
+  right: 20px;
+  top: 20px;
+  background: var(--zen-surface-elevated, #F5F2EB);
+  border: 1px solid rgba(122,145,141,0.20);
+  color: #2C2C2C;
+  font-size: 1.2rem;
   cursor: pointer;
-  padding: 12px 16px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.15), 0 2px 8px rgba(44,44,44,0.08);
   z-index: 100;
 }
 
 .settings-button:hover {
-  background: white;
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: #7A918D;
+  color: white;
+  border-color: #7A918D;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 4px 12px rgba(122,145,141,0.25);
 }
 
 .settings-button.active {
-  background: #667eea;
+  background: #7A918D;
   color: white;
+  border-color: #7A918D;
 }
 
 .mode-toggle {
@@ -62,24 +68,26 @@
 
 .mode-button {
   padding: 8px 20px;
-  border: 2px solid #667eea;
-  background: transparent;
-  color: #667eea;
-  border-radius: 25px;
+  border: 1px solid rgba(122,145,141,0.30);
+  background: rgba(122,145,141,0.06);
+  color: #2C2C2C;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mode-button:hover {
-  background: #667eea;
-  color: white;
+  background: rgba(122,145,141,0.12);
+  border-color: rgba(122,145,141,0.50);
 }
 
 .mode-button.active {
-  background: #667eea;
+  background: #7A918D;
   color: white;
+  border-color: #7A918D;
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 2px 8px rgba(122,145,141,0.25);
 }
 
 .timer-display {
@@ -116,45 +124,48 @@
 }
 
 .control-button.primary {
-  background: #667eea;
+  background: #7A918D;
   color: white;
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 4px 12px rgba(122,145,141,0.25);
 }
 
 .control-button.primary:hover {
-  background: #5568d3;
+  background: #8FA398;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 6px 20px rgba(122,145,141,0.35);
 }
 
 .control-button.secondary {
-  background: #e0e0e0;
-  color: #333;
+  background: rgba(44,44,44,0.04);
+  color: #2C2C2C;
+  border: 1px solid rgba(44,44,44,0.08);
 }
 
 .control-button.secondary:hover {
-  background: #d0d0d0;
+  background: rgba(44,44,44,0.08);
   transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(44,44,44,0.12), 0 2px 8px rgba(44,44,44,0.12);
 }
 
 .settings-panel {
   position: fixed;
-  left: 20px;
-  bottom: 80px;
-  width: 280px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
+  right: 20px;
+  top: 70px;
+  width: 300px;
+  background: var(--zen-surface-elevated, #F5F2EB);
+  backdrop-filter: blur(20px);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(122,145,141,0.20);
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.20), 0 8px 32px rgba(44,44,44,0.15);
   z-index: 99;
-  animation: slideInLeft 0.3s ease;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideInLeft {
+@keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -210,17 +221,19 @@
 
 .number-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #7A918D;
+  box-shadow: 0 0 0 2px rgba(122,145,141,0.20);
 }
 
 .settings-info {
-  background: #e7f3ff;
-  color: #0066cc;
+  background: rgba(122,145,141,0.10);
+  color: #2C2C2C;
   padding: 12px;
   border-radius: 8px;
   font-size: 0.9rem;
   margin-top: 15px;
   text-align: left;
+  border: 1px solid rgba(122,145,141,0.20);
 }
 
 .settings-info strong {
@@ -230,7 +243,7 @@
 
 .cycle-info {
   font-size: 0.9rem;
-  color: #667eea;
+  color: #7A918D;
   margin-top: 8px;
   font-weight: 500;
 }
@@ -242,39 +255,143 @@
 .permission-button {
   width: 100%;
   padding: 10px 20px;
-  background: #667eea;
+  background: #7A918D;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .permission-button:hover {
-  background: #5568d3;
+  background: #8FA398;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 0 0 1px rgba(122,145,141,0.30), 0 4px 12px rgba(122,145,141,0.25);
 }
 
 .notification-status {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(122,145,141,0.15);
+  color: #2C2C2C;
   padding: 12px;
   border-radius: 8px;
   font-size: 0.9rem;
   margin-bottom: 15px;
   text-align: center;
+  border: 1px solid rgba(122,145,141,0.25);
 }
 
 .notification-status:nth-last-child(2) {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(196, 167, 125, 0.15);
+  color: #2C2C2C;
+  border-color: rgba(196, 167, 125, 0.25);
 }
 
 .settings-divider {
   border: none;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(44,44,44,0.08);
   margin: 20px 0;
+}
+
+/* ========================================
+   深色模式适配
+   ======================================== */
+
+[data-theme="dark"] .container {
+  background: var(--zen-surface-elevated-dark, #252B2A);
+  box-shadow: 0 0 0 1px rgba(143,163,152,0.20), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] .title {
+  color: #F0ECE5;
+}
+
+[data-theme="dark"] .time {
+  color: #F0ECE5;
+}
+
+[data-theme="dark"] .mode-label {
+  color: #A8B0AF;
+}
+
+[data-theme="dark"] .mode-button {
+  border-color: rgba(143,163,152,0.30);
+  background: rgba(143,163,152,0.08);
+  color: #F0ECE5;
+}
+
+[data-theme="dark"] .mode-button:hover {
+  background: rgba(143,163,152,0.15);
+  border-color: rgba(143,163,152,0.50);
+}
+
+[data-theme="dark"] .control-button.secondary {
+  background: rgba(255,255,255,0.06);
+  color: #F0ECE5;
+  border-color: rgba(255,255,255,0.10);
+}
+
+[data-theme="dark"] .control-button.secondary:hover {
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] .settings-button {
+  background: #252B2A;
+  color: #F0ECE5;
+  border-color: rgba(143,163,152,0.20);
+  box-shadow: 0 0 0 1px rgba(143,163,152,0.15), 0 2px 8px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .settings-button:hover {
+  background: #8FA398;
+  color: #1A1E1D;
+  border-color: #8FA398;
+}
+
+[data-theme="dark"] .settings-panel {
+  background: #252B2A;
+  border-color: rgba(143,163,152,0.20);
+  box-shadow: 0 0 0 1px rgba(143,163,152,0.20), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .settings-title {
+  color: #F0ECE5;
+}
+
+[data-theme="dark"] .settings-label,
+[data-theme="dark"] .input-label {
+  color: #A8B0AF;
+}
+
+[data-theme="dark"] .number-input {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.10);
+  color: #F0ECE5;
+}
+
+[data-theme="dark"] .number-input:focus {
+  border-color: #8FA398;
+  box-shadow: 0 0 0 2px rgba(143,163,152,0.20);
+}
+
+[data-theme="dark"] .settings-info {
+  background: rgba(143,163,152,0.10);
+  color: #F0ECE5;
+  border-color: rgba(143,163,152,0.20);
+}
+
+[data-theme="dark"] .notification-status {
+  background: rgba(143,163,152,0.12);
+  color: #F0ECE5;
+  border-color: rgba(143,163,152,0.25);
+}
+
+[data-theme="dark"] .settings-divider {
+  border-top-color: rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .cycle-info {
+  color: #8FA398;
 }

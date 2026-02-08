@@ -266,3 +266,72 @@
   border-color: transparent;
   background-clip: padding-box;
 }
+
+/* ========================================
+   暗色模式样式
+   ======================================== */
+
+/* 暗色模式基础背景渐变 */
+[data-theme="dark"] .app-background {
+  background: radial-gradient(ellipse at top, #252B2A 0%, #1F2423 50%, #1A1E1D 100%);
+}
+
+/* 暗色模式噪点纹理 */
+[data-theme="dark"] .app-background::before {
+  opacity: 0.02;
+}
+
+/* 暗色模式光斑 */
+[data-theme="dark"] .blob-primary {
+  background: radial-gradient(ellipse, rgba(143, 163, 152, 0.15) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .blob-secondary {
+  background: radial-gradient(ellipse, rgba(196, 167, 125, 0.10) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .blob-tertiary {
+  background: radial-gradient(ellipse, rgba(143, 163, 152, 0.08) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .blob-accent {
+  background: radial-gradient(ellipse, rgba(143, 163, 152, 0.06) 0%, transparent 70%);
+}
+
+/* 暗色模式网格覆盖层 */
+[data-theme="dark"] .grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* 暗色模式渐变标题样式 */
+[data-theme="dark"] .gradient-title {
+  background: linear-gradient(to bottom, rgba(240, 236, 229, 1) 0%, rgba(240, 236, 229, 0.95) 50%, rgba(240, 236, 229, 0.7) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* 暗色模式卡片聚光灯效果 */
+[data-theme="dark"] .card-spotlight {
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(143, 163, 152, 0.10),
+    transparent
+  );
+}
+
+/* 暗色模式滚动条 */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

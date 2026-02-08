@@ -28,6 +28,26 @@
 - 背景层、文字、边框、阴影平滑过渡
 - 尊重 `prefers-reduced-motion` 用户偏好
 
+#### 4. 工具栏主题切换按钮
+- 在工具栏添加了主题快速切换按钮
+- 用户可以在不进入设置的情况下快速切换主题模式
+- 按钮图标根据当前主题动态显示（太阳/月亮/自动图标）
+
+#### 5. useTimer 监听设置变化
+- 当用户修改时间设置后，计时器自动更新剩余时间
+- 实现了设置变化与运行中计时器的同步
+- 避免了设置修改后需要重启计时器的问题
+
+#### 6. 设置对话框重构
+- 新增未保存更改离开确认功能
+- 添加高级功能设置区域
+- 改进设置对话框的用户体验和布局
+
+#### 7. 环形进度计算重构与日志功能
+- 重构 App 组件中的环形进度条计算逻辑
+- 添加详细的日志记录功能，便于调试和监控
+- 优化了进度条渲染性能
+
 ### 样式改进
 
 #### 1. 暗色模式组件适配
@@ -35,20 +55,10 @@
 - 设置对话框主题切换按钮组适配暗色模式
 - 图标根据主题偏好动态切换
 
-### 文件变更
-
-| 文件 | 修改类型 | 说明 |
-|------|----------|------|
-| `src/theme/index.ts` | 重构 | 添加 `ThemeMode` 类型、`darkDesignTokens`、`createZenTheme(mode)` |
-| `src/App.tsx` | 修改 | 添加主题状态管理、系统主题监听、外观设置 UI |
-| `src/styles/background.css` | 新增 | 添加 `[data-theme="dark"]` 暗色模式样式 |
-| `src/index.css` | 新增 | 添加主题切换过渡动画 |
-
----
-
-## 2026-02-08
-
-### Bug 修复
+#### 2. 计时器进度条颜色管理
+- 重构进度条配置系统
+- 优化主题颜色应用到进度条
+- 实现进度条颜色与主题模式的动态同步
 
 ### Bug 修复
 
@@ -60,6 +70,23 @@
   - 通过 useEffect 同步状态到 ref
   - 更新 `sendNotification` 和 `handleTimerComplete` 使用 ref 值
 - **影响文件**: `src/App.tsx`
+
+#### 2. useTimer onComplete 回调引用问题
+- **问题**: 计时器完成时回调函数引用不正确，导致无法正确触发
+- **修复**: 修复 useTimer 钩子中 onComplete 回调函数的引用问题
+- **影响文件**: `src/hooks/useTimer.ts`
+
+### 文件变更
+
+| 文件 | 修改类型 | 说明 |
+|------|----------|------|
+| `src/theme/index.ts` | 重构 | 添加 `ThemeMode` 类型、`darkDesignTokens`、`createZenTheme(mode)` |
+| `src/App.tsx` | 修改 | 添加主题状态管理、系统主题监听、外观设置 UI、环形进度计算重构、日志功能 |
+| `src/styles/background.css` | 新增 | 添加 `[data-theme="dark"]` 暗色模式样式 |
+| `src/index.css` | 新增 | 添加主题切换过渡动画 |
+| `src/components/Timer.tsx` | 修改 | 添加主题切换按钮 |
+| `src/hooks/useTimer.ts` | 修改 | 添加设置监听、修复回调引用 |
+| `src/components/SettingsDialog.tsx` | 重构 | 未保存确认、高级功能区域 |
 
 ---
 

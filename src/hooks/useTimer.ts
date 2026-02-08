@@ -141,6 +141,40 @@ export function useTimer(
   }, [mode, pomodoroCycle, onComplete]);
 
   /**
+   * 监听设置变化，更新当前模式的剩余时间
+   */
+  useEffect(() => {
+    setTimeLeftForMode(prev => {
+      const newTimes = {
+        focus: settings.customFocusTime,
+        break: settings.customBreakTime,
+        longBreak: settings.customLongBreakTime,
+      };
+
+      // 如果当前模式的时间设置变了，更新剩余时间
+      if (prev[mode] !== newTimes[mode]) {
+        // 只有在计时器未运行时才更新，避免干扰正在进行的计时
+        if (!isRunningForMode[mode]) {
+          // 同时更新 localStorage 中的时间
+          try {
+            const key = mode === 'focus'
+              ? STORAGE_KEYS.TIME_LEFT_FOCUS
+              : mode === 'break'
+              ? STORAGE_KEYS.TIME_LEFT_BREAK
+              : STORAGE_KEYS.TIME_LEFT_LONG_BREAK;
+            StorageManager.set(key, newTimes[mode]);
+          } catch (error) {
+            Logger.error('Failed to save time left', error);
+          }
+          return { ...prev, [mode]: newTimes[mode] };
+        }
+      }
+
+      return prev;
+    });
+  }, [settings.customFocusTime, settings.customBreakTime, settings.customLongBreakTime, mode, isRunningForMode]);
+
+  /**
    * 保存运行状态到 localStorage
    */
   useEffect(() => {

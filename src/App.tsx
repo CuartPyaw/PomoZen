@@ -405,12 +405,28 @@ function App() {
   const pomodoroCycleRef = useRef(pomodoroCycle);
 
   /**
+   * 通知相关状态引用
+   * 用于在闭包中获取最新的状态值
+   */
+  const autoSkipNotificationRef = useRef(autoSkipNotification);
+  const soundEnabledRef = useRef(soundEnabled);
+
+  /**
    * 同步更新 currentModeRef 和 pomodoroCycleRef
    */
   useEffect(() => {
     currentModeRef.current = mode;
     pomodoroCycleRef.current = pomodoroCycle;
   }, [mode, pomodoroCycle]);
+
+  /**
+   * 同步更新通知相关状态到 ref
+   * 确保 worker 回调中始终使用最新的状态值
+   */
+  useEffect(() => {
+    autoSkipNotificationRef.current = autoSkipNotification;
+    soundEnabledRef.current = soundEnabled;
+  }, [autoSkipNotification, soundEnabled]);
 
   /**
    * 初始化计时器 Worker
@@ -768,9 +784,9 @@ function App() {
    */
   const sendNotification = (title: string, body: string, playSound?: boolean) => {
     // 如果启用自动跳过通知，不显示弹窗
-    if (autoSkipNotification) {
+    if (autoSkipNotificationRef.current) {
       // 播放声音（如果启用且未明确禁用）
-      const shouldPlaySound = playSound !== undefined ? playSound : soundEnabled;
+      const shouldPlaySound = playSound !== undefined ? playSound : soundEnabledRef.current;
       if (shouldPlaySound) {
         playNotificationSound();
       }
@@ -785,7 +801,7 @@ function App() {
     setNotificationDialog({ open: true, title, message: body });
 
     // 播放声音（如果启用且未明确禁用）
-    const shouldPlaySound = playSound !== undefined ? playSound : soundEnabled;
+    const shouldPlaySound = playSound !== undefined ? playSound : soundEnabledRef.current;
     if (shouldPlaySound) {
       playNotificationSound();
     }
@@ -833,7 +849,7 @@ function App() {
 
     // 如果显示通知弹窗（即未启用自动跳过），则不自动切换
     // 等待用户关闭弹窗后再切换，给用户确认的机会
-    if (!autoSkipNotification) {
+    if (!autoSkipNotificationRef.current) {
       console.log('⚠ Notification dialog is shown, skipping auto-switch until user closes it');
       return;
     }

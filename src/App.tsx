@@ -263,7 +263,7 @@ function App() {
     if (timer.mode === 'longBreak') {
       return '长休息';
     }
-    return `番茄钟周期: ${timer.pomodoroCycle}/${POMODORO_CYCLE_COUNT}`;
+    return `${timer.pomodoroCycle}/${POMODORO_CYCLE_COUNT}`;
   };
 
   // ==================== 渲染数据 ====================
@@ -862,7 +862,7 @@ function SettingsDialog({
                 循环模式说明
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                专注 → 短休息 (重复 {POMODORO_CYCLE_COUNT} 次) → 长休息
+                专注 → 短休息 (第 {POMODORO_CYCLE_COUNT} 次后长休息)
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
                 💡 自动切换时才会自动开始，手动切换需点击"开始"

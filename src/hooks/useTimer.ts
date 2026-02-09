@@ -26,7 +26,7 @@ const STORAGE_KEYS = {
 } as const;
 
 // 常量配置
-const POMODORO_CYCLE_COUNT = 5;
+const POMODORO_CYCLE_COUNT = 4;
 const MODE_SWITCH_DELAY = 2000;
 
 /**
@@ -56,8 +56,8 @@ export function useTimer(
     return saved && ['focus', 'break', 'longBreak'].includes(saved) ? saved : 'focus';
   });
 
-  // 番茄钟周期计数（1-5）
-  const [pomodoroCycle, setPomodoroCycle] = useState(1);
+  // 番茄钟周期计数（0-4）
+  const [pomodoroCycle, setPomodoroCycle] = useState(0);
 
   // 计时器完成保护标志
   const [completionGuard, setCompletionGuard] = useState(false);
@@ -267,6 +267,12 @@ export function useTimer(
 
     if (!isCurrentRunning) {
       setCompletionGuard(false);
+
+      // 开始专注模式计时时，周期 +1
+      if (mode === 'focus') {
+        setPomodoroCycle((prev) => prev + 1);
+      }
+
       timerWorkerRef.current?.postMessage({
         type: 'START',
         mode,
@@ -326,10 +332,9 @@ export function useTimer(
     }
 
     if (mode === 'longBreak') {
-      setPomodoroCycle(1);
-    } else if (mode === 'focus') {
-      setPomodoroCycle((prev) => prev + 1);
+      setPomodoroCycle(0);
     }
+    // 周期已在开始专注时 +1，此处不再修改
 
     const initialTime = getTimeForMode(nextMode);
     setTimeLeftForMode((prev) => {
@@ -425,10 +430,9 @@ export function useTimer(
       }
 
       if (completedMode === 'longBreak') {
-        setPomodoroCycle(1);
-      } else if (completedMode === 'focus') {
-        setPomodoroCycle((prev) => prev + 1);
+        setPomodoroCycle(0);
       }
+      // 周期已在开始专注时 +1，此处不再修改
 
       const nextModeTime = getTimeForMode(nextMode);
       setTimeLeftForMode((prev) => ({ ...prev, [nextMode]: nextModeTime }));
@@ -445,6 +449,11 @@ export function useTimer(
         setMode(nextMode);
 
         if (settings.autoStart) {
+          // 自动开始专注模式时，周期 +1
+          if (nextMode === 'focus') {
+            setPomodoroCycle((prev) => prev + 1);
+          }
+
           timerWorkerRef.current?.postMessage({
             type: 'START',
             mode: nextMode,
@@ -481,10 +490,9 @@ export function useTimer(
     }
 
     if (lastCompletedMode === 'longBreak') {
-      setPomodoroCycle(1);
-    } else if (lastCompletedMode === 'focus') {
-      setPomodoroCycle((prev) => prev + 1);
+      setPomodoroCycle(0);
     }
+    // 周期已在开始专注时 +1，此处不再修改
 
     const nextModeTime = getTimeForMode(nextMode);
     setTimeLeftForMode((prev) => ({ ...prev, [nextMode]: nextModeTime }));
@@ -496,6 +504,11 @@ export function useTimer(
     setMode(nextMode);
 
     if (settings.autoStart) {
+      // 自动开始专注模式时，周期 +1
+      if (nextMode === 'focus') {
+        setPomodoroCycle((prev) => prev + 1);
+      }
+
       timerWorkerRef.current?.postMessage({
         type: 'START',
         mode: nextMode,

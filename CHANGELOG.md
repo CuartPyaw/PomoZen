@@ -1,5 +1,18 @@
 # 开发日志
 
+<!-- 以上内容由 conventional-changelog 自动生成 -->
+
+## 手动维护历史
+
+
+## [1.0.5](https://github.com/CuartPyaw/PomoZen/compare/v1.0.4...v1.0.5) (2026-02-09)
+
+* ✨ feat(App): 新增GTD任务管理功能并重构布局。 ([](https://github.com/CuartPyaw/PomoZen/commit/6ef03c7a87d34953d71d74d9b5947b5f97a225a0))
+* 🔧 chore(release-it): 移除发布配置中的 assets 字段。 ([](https://github.com/CuartPyaw/PomoZen/commit/cee3a0daf4d18b3f107ebb5ffdb913b23b54bb9b))
+* 🔧 chore(release): 配置 @release-it/conventional-changelog 插件 ([](https://github.com/CuartPyaw/PomoZen/commit/b0dc0965e2a36e7def22c922c740df93df1d33b1))
+
+# 开发日志
+
 ## 2026-02-08
 
 ### 新增功能

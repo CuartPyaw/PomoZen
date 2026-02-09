@@ -30,6 +30,22 @@ const PRIORITY_COLORS = {
   low: '#64B5F6',     // 蓝色 - 最低
 } as const;
 
+/** 优先级配置 */
+const PRIORITY_CONFIG = {
+  high: {
+    label: '最高',
+    color: '#E57373',
+  },
+  medium: {
+    label: '中等',
+    color: '#FFB74D',
+  },
+  low: {
+    label: '最低',
+    color: '#64B5F6',
+  },
+} as const;
+
 interface TaskItemProps {
   task: Task;
   isActive: boolean;
@@ -115,20 +131,31 @@ export const TaskItem = memo<TaskItemProps>(({
 
         {/* 任务信息 */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          {/* 标题 */}
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: isCompleted ? 400 : 500,
-              textDecoration: isCompleted ? 'line-through' : 'none',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              mb: task.description ? 0.5 : 0,
-            }}
-          >
-            {task.title}
-          </Typography>
+          {/* 标题和优先级标签 */}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: task.description ? 0.5 : 0 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: isCompleted ? 400 : 500,
+                textDecoration: isCompleted ? 'line-through' : 'none',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {task.title}
+            </Typography>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: PRIORITY_CONFIG[task.priority].color,
+                ml: 1,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
 
           {/* 描述 */}
           {task.description && (

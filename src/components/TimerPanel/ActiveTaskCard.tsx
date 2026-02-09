@@ -19,6 +19,22 @@ import {
 } from '@mui/icons-material';
 import type { Task } from '../../types/task';
 
+/** 优先级配置 */
+const PRIORITY_CONFIG = {
+  high: {
+    label: '最高',
+    color: '#E57373',
+  },
+  medium: {
+    label: '中等',
+    color: '#FFB74D',
+  },
+  low: {
+    label: '最低',
+    color: '#64B5F6',
+  },
+} as const;
+
 interface ActiveTaskCardProps {
   task: Task;
   onUnlink: () => void;
@@ -51,17 +67,28 @@ export const ActiveTaskCard: React.FC<ActiveTaskCardProps> = ({
             }}
           />
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {task.title}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {task.title}
+              </Typography>
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: PRIORITY_CONFIG[task.priority].color,
+                  flexShrink: 0,
+                }}
+              />
+            </Box>
           </Box>
           <IconButton size="small" onClick={onUnlink} sx={{ p: 0.5 }}>
             <CloseIcon fontSize="small" />

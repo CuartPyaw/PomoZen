@@ -24,5 +24,44 @@
     "after:bump": "echo '✅ 版本已更新: ${version}'",
     "after:release": "echo '🚀 Release v${version} 已发布!'"
   },
-  "plugins": {}
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "header": "# 开发日志\n\n<!-- 以上内容由 conventional-changelog 自动生成 -->\n\n## 手动维护历史\n",
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          { "type": "feat", "section": "✨ 新增功能", "hidden": false },
+          { "type": "fix", "section": "🐛 Bug 修复", "hidden": false },
+          { "type": "chore", "section": "🔧 构建/工具", "hidden": false },
+          { "type": "style", "section": "🌈 样式改进", "hidden": false },
+          { "type": "docs", "section": "📝 文档更新", "hidden": false },
+          { "type": "refactor", "section": "♻️ 代码重构", "hidden": false },
+          { "type": "perf", "section": "⚡ 性能优化", "hidden": false },
+          { "type": "test", "section": "测试", "hidden": true },
+          { "type": "build", "section": "构建", "hidden": true }
+        ]
+      },
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "不兼容变更"]
+      },
+      "writerOpts": {
+        "groupBy": "type",
+        "commitsGroupSort": ["scope", "subject"],
+        "commitGroupsSort": "title",
+        "types": [
+          { "type": "feat", "section": "✨ 新增功能" },
+          { "type": "fix", "section": "🐛 Bug 修复" },
+          { "type": "chore", "section": "🔧 构建/工具" },
+          { "type": "style", "section": "🌈 样式改进" },
+          { "type": "docs", "section": "📝 文档更新" },
+          { "type": "refactor", "section": "♻️ 代码重构" },
+          { "type": "perf", "section": "⚡ 性能优化" }
+        ],
+        "transform": {
+          "trimHash": false
+        }
+      }
+    }
+  }
 }

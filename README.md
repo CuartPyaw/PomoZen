@@ -147,10 +147,6 @@ docker build -t pomozen .
 docker run -d -p 8080:80 --name pomozen pomozen
 ```
 
-### 静态托管
-
-构建后将 `dist/` 目录部署到任何静态托管服务。
-
 ## 🗺️ 开发路线图
 
 - [x] **核心功能**：三种计时模式、Web Worker 计时器、状态持久化

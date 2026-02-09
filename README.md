@@ -1,51 +1,53 @@
-# PomoZen
+<div align="center">
+  <img src="public/favicon.svg" width="120" alt="PomoZen Logo" />
+  <h1>PomoZen</h1>
+  <p><b>竹林清风 — 禅意番茄钟</b></p>
+  <p>融合中国传统美学与现代技术的番茄工作法计时器</p>
 
-<p align="center">
-  <img src="public/favicon.svg" alt="PomoZen Logo" width="128" height="128">
-</p>
+  <p>
+    <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" />
+    <img src="https://img.shields.io/badge/React-18.3.1-61dafb?style=flat-square&logo=react" />
+    <img src="https://img.shields.io/badge/TypeScript-5.7.2-3178c6?style=flat-square&logo=typescript" />
+    <img src="https://img.shields.io/badge/Vite-6.0.3-646cff?style=flat-square&logo=vite" />
+    <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+  </p>
+</div>
 
-<p align="center">
-  <em>竹林清风 — 禅意番茄钟</em>
-</p>
+<br />
 
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md) [![Changelog](https://img.shields.io/badge/changelog-更新记录-green.svg)](CHANGELOG.md) [![PomoZen](https://img.shields.io/badge/主题-竹林清风-7A918D)](public/favicon.svg)
+<div align="center">
+  <a href="https://github.com/CuartPyaw/pomozen"><strong>🌐 GitHub 仓库</strong></a> &nbsp;•&nbsp;
+  <a href="#快速开始"><strong>🚀 快速开始</strong></a> &nbsp;•&nbsp;
+  <a href="#核心特性"><strong>✨ 核心特性</strong></a>
+</div>
 
-> A modern Pomodoro timer with a Zen-inspired "Bamboo Forest Breeze" aesthetic. Combining traditional Chinese design philosophy with modern web technology.
+<br />
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![React](https://img.shields.io/badge/React-18.3.1-cyan)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+PomoZen 是一款融合中国传统「竹林清风」美学意境的番茄工作法计时器。摒弃繁杂 UI 干扰，专注于沉浸式专注体验。计时器运行于 Web Worker 线程，确保计时精准不受浏览器节流影响。所有数据存储于本地，隐私无忧。
 
----
+## ✨ 核心特性
 
-## Features
+- ⏱️ **精准计时**：基于 Web Worker 的计时器，不受浏览器节流或标签页切换影响
+- 🎨 **禅意主题**：竹林清风配色方案（竹青、宣纸白、墨黑），支持亮色/暗色/自动切换
+- 📊 **统计仪表板**：可视化专注历史，包含折线图、柱状图和时间分布热力图
+- 🔔 **智能提醒**：桌面通知 + 声音提醒，支持自动跳过已完成通知
+- ⚙️ **灵活配置**：自定义专注/休息时长，自动切换、自动开始等选项
+- 💾 **本地持久化**：所有设置和统计数据存储于 localStorage，刷新不丢失
+- 🌙 **平滑动画**：多层级环境背景，禅意光影效果，尊重用户动画偏好设置
+- 🚀 **多种部署**：支持 Vercel、Docker、静态托管等多种部署方式
 
-- **Three Timer Modes**: Focus (25min), Short Break (5min), Long Break (30min)
-- **Web Worker Timer**: Accurate countdown unaffected by browser throttling or tab focus
-- **Auto-Switch**: Automatic progression through Pomodoro cycles
-- **Desktop Notifications**: Browser-native alerts when timer completes
-- **Statistics Dashboard**: Visualize focus history with interactive charts
-- **State Persistence**: Timer state and settings saved to localStorage
-- **Zen Theme**: Chinese "Bamboo Forest Breeze" aesthetic with 竹青 (Bamboo Green), 宣纸白 (Xuan Paper White), and 墨黑 (Ink Black) color palette
-- **Multiple Deployment Options**: Support for Vercel, Docker, and static hosting
+## 🛠️ 技术栈
 
----
+| 类别 | 技术 |
+|------|------|
+| **核心框架** | React 18.3.1 + TypeScript 5.7.2 |
+| **构建工具** | Vite 6.0.3 |
+| **UI 组件** | Material-UI 7.3.7 + Emotion |
+| **图表库** | Recharts 3.7.0 + Chart.js 4.5.1 |
+| **图标** | @mui/icons-material 7.3.7 |
+| **部署** | Vercel, Docker + Nginx |
 
-## Tech Stack
-
-| Category | Technology |
-|----------|------------|
-| **Framework** | React 18.3.1 + TypeScript |
-| **Build Tool** | Vite 6.0.3 |
-| **UI Library** | Material-UI (MUI) 7.3.7 |
-| **Charts** | Recharts 3.7.0, Chart.js 4.5.1 |
-| **Styling** | Emotion (CSS-in-JS) + Custom CSS |
-| **Deployment** | Vercel, Docker + Nginx |
-
----
-
-## Project Structure
+## 📂 目录结构
 
 ```
 PomoZen/
@@ -95,268 +97,85 @@ PomoZen/
 └── tsconfig.json                     # TypeScript 配置
 ```
 
----
+## 🚀 快速开始
 
-## Quick Start
+### 环境要求
+- Node.js >= 18.0
+- npm >= 9.0
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
+### 安装运行
 
 ```bash
-# Clone the repository
+# 1. 克隆项目
 git clone https://github.com/CuartPyaw/pomozen.git
+
+# 2. 进入目录
 cd pomozen
 
-# Install dependencies
+# 3. 安装依赖
 npm install
-```
 
-### Development
-
-```bash
-# Start development server with HMR
+# 4. 启动开发服务器
 npm run dev
+# 访问 http://localhost:5173
 ```
 
-Visit `http://localhost:5173` to see the application.
-
-### Production Build
+### 生产构建
 
 ```bash
-# Build for production (TypeScript check + Vite build)
+# 构建生产版本
 npm run build
 
-# Preview production build locally
+# 预览生产构建
 npm run preview
 ```
 
----
+## 📦 部署
 
-## 部署
-
-### Option 1: Vercel (Recommended)
+### Vercel（推荐）
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CuartPyaw/pomozen)
 
-#### Using Vercel CLI
+### Docker
 
 ```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel
-```
-
-Follow the prompts to complete the deployment. Vercel will automatically detect your Vite + React project configuration.
-
-**Deploy to production:**
-```bash
-vercel --prod
-```
-
-#### Using Vercel Dashboard
-
-1. Push your code to GitHub
-2. Visit [vercel.com](https://vercel.com) and click "Add New" → "Project"
-3. Import your repository
-4. Click "Deploy"
-
-Vercel will automatically configure:
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist`
-- **Framework**: Vite
-
-#### Optional: Create vercel.json
-
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm ci",
-  "framework": "vite"
-}
-```
-
----
-
-### Option 2: Docker
-
-#### Using Docker Compose (Recommended)
-
-```bash
-# Build and start the container
+# 使用 Docker Compose
 docker-compose up -d
 
-# View logs
-docker-compose logs -f
-
-# Stop the service
-docker-compose down
-```
-
-#### Manual Docker Build
-
-```bash
-# Build the image
+# 或手动构建
 docker build -t pomozen .
-
-# Run the container
 docker run -d -p 8080:80 --name pomozen pomozen
 ```
 
-Visit `http://localhost:8080` after container starts.
+### 静态托管
 
----
+构建后将 `dist/` 目录部署到任何静态托管服务。
 
-### Option 3: Static Hosting
+## 🗺️ 开发路线图
 
-After building the project, you can deploy the `dist/` folder to any static hosting service:
+- [x] **核心功能**：三种计时模式、Web Worker 计时器、状态持久化
+- [x] **禅意主题**：竹林清风配色、亮色/暗色模式、环境背景动画
+- [x] **统计功能**：每日/每周/每月统计、时间分布热力图
+- [x] **通知系统**：桌面通知、声音提醒、自动跳过
+- [ ] **PWA 支持**：离线使用、桌面安装
+- [ ] **云端同步**：跨设备数据同步
 
-- **Netlify**: Drag and drop the `dist/` folder
-- **GitHub Pages**: Push to `gh-pages` branch
-- **AWS S3 + CloudFront**: Upload to S3 bucket
-- **Firebase Hosting**: `firebase init` + `firebase deploy`
+## 🤝 贡献指南
 
----
+我们欢迎社区贡献！
 
-## Usage
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
 
-### Timer Modes
+## 📄 许可证
 
-1. **Focus Mode** (default 25 minutes): Concentrate on your work
-2. **Short Break** (default 5 minutes): Rest between focus sessions
-3. **Long Break** (default 30 minutes): Extended rest after 5 focus sessions
+本项目基于 [MIT License](./LICENSE) 开源。
 
-### Controls
-
-- **Play/Pause**: Start or pause the current timer
-- **Reset**: Reset current timer to initial duration
-- **Skip Next**: Manually advance to next mode
-- **Settings**: Customize durations and toggle features
-
-### Settings Options
-
-| Setting | Description |
-|---------|-------------|
-| Custom Duration | Set custom time for each mode (in minutes) |
-| Auto Switch | Automatically progress to next mode after completion |
-| Auto Start | Automatically begin next timer without manual intervention |
-| Notifications | Enable desktop notifications when timer completes |
-
-### Statistics
-
-Access the statistics dialog to view:
-- Daily focus time trends (line chart)
-- Weekly focus session distribution (bar chart)
-- Monthly focus patterns (line chart)
-- Time distribution heatmap (hourly focus patterns)
-- Total focus time and session count
-- Configurable time range (7/30/90 days or all)
-
----
-
-## Architecture
-
-### Web Worker Timer Pattern
-
-The timer runs in a Web Worker (`src/workers/timerWorker.ts`) to ensure accurate timing regardless of browser throttling or tab focus state.
-
-**Worker Communication:**
-- `WorkerCommand` (main → worker): START, PAUSE, RESUME, RESET, SET_TIME
-- `WorkerMessage` (worker → main): UPDATE (every second), COMPLETE
-
-Each timer mode (`focus`, `break`, `longBreak`) maintains independent state in the worker, enabling parallel timer tracking.
-
-### State Persistence
-
-All application state is persisted to localStorage with prefixed keys (`tomato-*`). Recovery mechanism on app init:
-
-1. Reads saved mode and time-left values
-2. Restores `wasRunning` flags to determine auto-resume behavior
-3. Recreates worker state with saved values
-
----
-
-## Configuration
-
-### Path Aliases
-
-TypeScript path alias `@/*` maps to `src/*`:
-
-```typescript
-import { WorkerCommand } from '@/types/worker';
-```
-
-### Environment
-
-No environment variables required for basic functionality. All settings are managed through the UI and stored in localStorage.
-
----
-
-## Development Notes
-
-### Common Pitfalls
-
-**Date String Handling and Timezone Issues**
-
-**Problem**: `new Date("YYYY-MM-DD")` parses date-only strings as UTC time (00:00:00 UTC), which can cause incorrect date comparisons in non-UTC timezones.
-
-**Solution**: For date-only string comparisons, convert both dates to UTC string format using `toISOString().substring(0, 10)` before comparing.
-
-```typescript
-// ❌ Wrong: Fails in non-UTC timezones
-const recordDate = new Date(record.date);
-if (recordDate <= today) { ... }
-
-// ✅ Correct: Use string comparison
-const todayString = today.toISOString().substring(0, 10);
-if (record.date <= todayString) { ... }
-```
-
-**Location**: See [src/App.tsx:1034-1064](src/App.tsx#L1034-L1064) for the corrected implementation.
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
-[MIT License](LICENSE)
-
----
-
-## Acknowledgments
+## 🙏 致谢
 
 - [Pomodoro Technique](https://cirillocompany.com/pages/pomodoro-technique) by Francesco Cirillo
-- [Linear](https://linear.app) design inspiration
-- Built with [React](https://react.dev), [Vite](https://vitejs.dev), and [Material-UI](https://mui.com)
-
----
-
-## Support
-
-If you encounter any issues or have questions, please:
-
-- Open an issue on GitHub
-- Check existing documentation
-- Review the [Architecture](#architecture) section for technical details
-
-**Live Demo**: [Deploy your own instance and add the link here!]
+- [Linear](https://linear.app) 设计灵感
+- 基于 [React](https://react.dev)、[Vite](https://vitejs.dev) 和 [Material-UI](https://mui.com) 构建

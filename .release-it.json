@@ -13,7 +13,8 @@
     "tokenRef": "GITHUB_TOKEN",
     "assets": ["dist/*"],
     "proxy": false,
-    "draft": false
+    "draft": false,
+    "autoGenerate": true
   },
   "npm": {
     "publish": false

@@ -1,0 +1,23 @@
+{
+  "git": {
+    "commitMessage": "chore(release): v${version}",
+    "tagName": "v${version}",
+    "push": true,
+    "requireCleanWorkingDir": true
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}",
+    "tokenRef": "GITHUB_TOKEN",
+    "assets": ["dist/*"],
+    "proxy": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "before:init": ["npm run build"],
+    "after:bump": "echo '✅ 版本已更新: ${version}'",
+    "after:release": "echo '🚀 Release v${version} 已发布!'"
+  }
+}

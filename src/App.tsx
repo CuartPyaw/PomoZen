@@ -40,6 +40,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
+import { GridLegacy as Grid } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -63,6 +64,8 @@ import {
   MonthlyLineChart,
   TimeDistributionHeatmap,
 } from './components/Charts';
+import { TaskPanel } from './components/TaskPanel';
+import { ActiveTaskCard } from './components/TimerPanel';
 
 // Custom hooks
 import { useTheme } from './hooks/useTheme';
@@ -70,6 +73,7 @@ import { useSettings } from './hooks/useSettings';
 import { useStatistics } from './hooks/useStatistics';
 import { useNotifications } from './hooks/useNotifications';
 import { useTimer } from './hooks/useTimer';
+import { useTasks } from './hooks/useTasks';
 
 import { Logger } from './utils/logger';
 
@@ -132,6 +136,9 @@ function App() {
     settings.autoSkipNotification
   );
 
+  // GTD 任务管理
+  const tasks = useTasks();
+
   // 计时器核心逻辑 - 需要在通知之前定义，因为通知需要引用计时器的完成回调
   const timer = useTimer(
     {
@@ -162,6 +169,10 @@ function App() {
       notifications.sendNotification('专注结束', '时间到了！该休息一下了');
       // 使用实际完成的时长（秒）
       statistics.updateTodayFocusRecord(completedDuration);
+      // 记录到关联的任务
+      if (tasks.currentTaskId) {
+        tasks.recordPomodoro(tasks.currentTaskId, completedDuration);
+      }
     } else if (completedMode === 'break') {
       notifications.sendNotification('休息结束', '休息完成！开始专注吧');
     } else if (completedMode === 'longBreak') {
@@ -365,7 +376,47 @@ function App() {
             </Toolbar>
           </AppBar>
 
-          <Container maxWidth="sm" sx={{ flex: 1, display: 'flex', flexDirection: 'column', py: 2 }}>
+          <Container maxWidth="xl" sx={{ flex: 1, py: 2 }}>
+            <Grid container spacing={2} sx={{ height: { md: 'calc(100vh - 100px)' } }}>
+              {/* 左侧任务面板 - 只在大屏幕显示 */}
+              <Grid
+                item
+                xs={12}
+                md={5}
+                lg={4}
+                sx={{
+                  display: { xs: 'none', md: 'block' },
+                  height: '100%',
+                }}
+              >
+                <TaskPanel
+                  tasks={tasks.getFilteredTasks()}
+                  currentTaskId={tasks.currentTaskId}
+                  viewMode={tasks.viewMode}
+                  searchQuery={tasks.searchQuery}
+                  onViewModeChange={tasks.setViewMode}
+                  onSearchChange={tasks.setSearchQuery}
+                  onTaskUpdate={(id, updates) => tasks.updateTask(id, updates)}
+                  onTaskDelete={tasks.deleteTask}
+                  onLinkToTimer={tasks.linkTaskToTimer}
+                  onToggleTaskStatus={tasks.toggleTaskStatus}
+                  onAddTask={tasks.addTask}
+                />
+              </Grid>
+
+              {/* 右侧计时器面板 */}
+              <Grid item xs={12} md={7} lg={8} sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* 活动任务卡片 */}
+            {tasks.currentTaskId && (() => {
+              const currentTask = tasks.getCurrentTask();
+              return currentTask ? (
+                <ActiveTaskCard
+                  task={currentTask}
+                  onUnlink={() => tasks.linkTaskToTimer(null)}
+                />
+              ) : null;
+            })()}
+
             {/* 模式切换按钮组 */}
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
               <ButtonGroup variant="outlined" sx={{ bgcolor: 'rgba(44,44,44,0.03)', borderRadius: 2, '& .MuiButtonGroup-grouped': { borderColor: 'rgba(44,44,44,0.08)' } }}>
@@ -664,6 +715,8 @@ function App() {
                 </CardContent>
               </Card>
             </Box>
+              </Grid>
+            </Grid>
           </Container>
 
           {/* 设置按钮 */}

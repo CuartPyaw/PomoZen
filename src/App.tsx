@@ -76,7 +76,7 @@ import { Logger } from './utils/logger';
 import './styles/background.css';
 
 // 常量配置
-const POMODORO_CYCLE_COUNT = 5;
+const POMODORO_CYCLE_COUNT = 4;
 
 // 计时器圆形进度条配置
 const TIMER_CIRCLE_CONFIG = {
@@ -913,7 +913,7 @@ function SettingsDialog({
                         ⚠️ 警告：此功能仅用于测试，手动修改周期可能导致计时逻辑异常
                       </Typography>
                       <ButtonGroup variant="outlined" size="small" fullWidth>
-                        {[1, 2, 3, 4, 5].map((num) => (
+                        {[1, 2, 3, 4].map((num) => (
                           <Button
                             key={num}
                             onClick={() => timer.setPomodoroCycle(num)}

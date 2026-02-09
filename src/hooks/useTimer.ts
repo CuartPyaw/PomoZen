@@ -297,8 +297,6 @@ export function useTimer(
       mode,
       initialTime: resetTime,
     } as WorkerCommand);
-
-    setPomodoroCycle(1);
   }, [mode, getTimeForMode]);
 
   /**

@@ -5,6 +5,14 @@
 ## 手动维护历史
 
 
+## [1.0.6](https://github.com/CuartPyaw/PomoZen/compare/v1.0.5...v1.0.6) (2026-02-09)
+
+* 👷 ci(release): 更新 GitHub Actions 工作流中的依赖缓存策略。 ([](https://github.com/CuartPyaw/PomoZen/commit/5145728c27448575459dcda8b672b06b956aafb4))
+
+### fix
+
+* 提交 package-lock.json 确保 CI 依赖一致性 ([](https://github.com/CuartPyaw/PomoZen/commit/db13c9c628660ec45b75ded220d468a0d82fb990))
+
 ## [1.0.5](https://github.com/CuartPyaw/PomoZen/compare/v1.0.4...v1.0.5) (2026-02-09)
 
 * ✨ feat(App): 新增GTD任务管理功能并重构布局。 ([](https://github.com/CuartPyaw/PomoZen/commit/6ef03c7a87d34953d71d74d9b5947b5f97a225a0))

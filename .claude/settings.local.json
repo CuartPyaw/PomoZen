@@ -4,7 +4,9 @@
       "Bash(taskkill:*)",
       "Bash(npm run build)",
       "Bash(npm install:*)",
-      "Bash(wslpath:*)"
+      "Bash(wslpath:*)",
+      "Skill(code-review:code-review)",
+      "Skill(code-review:code-review:*)"
     ]
   }
 }

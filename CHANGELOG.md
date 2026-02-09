@@ -5,6 +5,11 @@
 ## 手动维护历史
 
 
+## [1.0.7](https://github.com/CuartPyaw/PomoZen/compare/v1.0.6...v1.0.7) (2026-02-09)
+
+* ✨ feat(TaskDialog): 为任务对话框添加优先级选择功能 ([](https://github.com/CuartPyaw/PomoZen/commit/2640770c1cdf166095cb7cb00beb45fb39cac9df))
+* 🔧 chore(release-it): 删除 release-it 配置文件。 ([](https://github.com/CuartPyaw/PomoZen/commit/c53f713c67bd954c090f64845076156d73f293d9))
+
 ## [1.0.6](https://github.com/CuartPyaw/PomoZen/compare/v1.0.5...v1.0.6) (2026-02-09)
 
 * 👷 ci(release): 更新 GitHub Actions 工作流中的依赖缓存策略。 ([](https://github.com/CuartPyaw/PomoZen/commit/5145728c27448575459dcda8b672b06b956aafb4))

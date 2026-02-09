@@ -11,6 +11,14 @@
 export type TaskStatus = 'pending' | 'completed';
 
 /**
+ * 任务优先级
+ * - high: 最高（红色）
+ * - medium: 中等（黄色）
+ * - low: 最低（蓝色）
+ */
+export type TaskPriority = 'high' | 'medium' | 'low';
+
+/**
  * 视图模式 - 简化版三标签页
  */
 export type TaskViewMode = 'all' | 'completed' | 'pending';
@@ -27,6 +35,8 @@ export interface Task {
   description?: string;
   /** 当前状态 */
   status: TaskStatus;
+  /** 任务优先级 */
+  priority: TaskPriority;
   /** 已完成番茄钟数量 */
   completedPomodoros: number;
   /** 总专注时长（秒） */

@@ -23,6 +23,13 @@ import {
 } from '@mui/icons-material';
 import type { Task } from '../../types/task';
 
+/** 优先级颜色映射 */
+const PRIORITY_COLORS = {
+  high: '#E57373',    // 红色 - 最高
+  medium: '#FFB74D',  // 黄色 - 中等
+  low: '#64B5F6',     // 蓝色 - 最低
+} as const;
+
 interface TaskItemProps {
   task: Task;
   isActive: boolean;
@@ -53,11 +60,25 @@ export const TaskItem = memo<TaskItemProps>(({
         transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
         border: `1px solid ${isActive ? 'primary.main' : 'divider'}`,
         backgroundColor: isActive ? 'action.hover' : 'background.paper',
+        position: 'relative',
+        overflow: 'hidden',
         '&:hover': {
           borderColor: isActive ? 'primary.main' : 'text.secondary',
           transform: 'translateX(4px)',
         },
         opacity: isCompleted ? 0.6 : 1,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '4px',
+          backgroundColor: PRIORITY_COLORS[task.priority],
+          borderTopLeftRadius: (theme) => theme.shape.borderRadius,
+          borderBottomLeftRadius: (theme) => theme.shape.borderRadius,
+          transition: 'background-color 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+        },
       }}
       onClick={(e) => {
         // 只有点击非交互区域时才触发

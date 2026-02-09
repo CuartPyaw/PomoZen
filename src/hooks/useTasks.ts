@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type {
   Task,
+  TaskPriority,
   TaskSession,
   TaskViewMode,
   TaskStorage,
@@ -86,18 +87,29 @@ export function useTasks(): UseTasksReturn {
     if (saved) {
       try {
         const data: TaskStorage = JSON.parse(saved);
-        // 数据迁移：将旧的 GTD 状态转换为新的简化状态
+        // 数据迁移：将旧的 GTD 状态转换为新的简化状态，并添加优先级
         return (data.tasks || []).map(task => {
-          // 旧数据迁移逻辑
+          let migratedTask = task;
+
+          // 旧数据迁移逻辑：status 转换
           if ('status' in task && typeof task.status === 'string') {
             const oldStatus = task.status as string;
             // 将 done 转换为 completed，其他转换为 pending
             if (oldStatus === 'done') {
-              return { ...task, status: 'completed' as const };
+              migratedTask = { ...migratedTask, status: 'completed' as const };
+            } else {
+              migratedTask = { ...migratedTask, status: 'pending' as const };
             }
-            return { ...task, status: 'pending' as const };
+          } else {
+            migratedTask = { ...migratedTask, status: 'pending' as const };
           }
-          return { ...task, status: 'pending' as const };
+
+          // 优先级字段迁移：为没有优先级的任务添加默认优先级
+          if (!('priority' in migratedTask) || migratedTask.priority === undefined) {
+            migratedTask = { ...migratedTask, priority: 'low' as TaskPriority };
+          }
+
+          return migratedTask;
         });
       } catch (error) {
         Logger.error('Failed to parse tasks', error);

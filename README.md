@@ -1,8 +1,16 @@
 # PomoZen
 
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md) [![Changelog](https://img.shields.io/badge/changelog-更新记录-green.svg)](CHANGELOG.md)
+<p align="center">
+  <img src="public/favicon.svg" alt="PomoZen Logo" width="128" height="128">
+</p>
 
-> A modern Pomodoro timer application with Linear-inspired design aesthetic.
+<p align="center">
+  <em>竹林清风 — 禅意番茄钟</em>
+</p>
+
+[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md) [![简体中文](https://img.shields.io/badge/lang-简体中文-red.svg)](README.zh-CN.md) [![Changelog](https://img.shields.io/badge/changelog-更新记录-green.svg)](CHANGELOG.md) [![PomoZen](https://img.shields.io/badge/主题-竹林清风-7A918D)](public/favicon.svg)
+
+> A modern Pomodoro timer with a Zen-inspired "Bamboo Forest Breeze" aesthetic. Combining traditional Chinese design philosophy with modern web technology.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![React](https://img.shields.io/badge/React-18.3.1-cyan)
@@ -19,7 +27,7 @@
 - **Desktop Notifications**: Browser-native alerts when timer completes
 - **Statistics Dashboard**: Visualize focus history with interactive charts
 - **State Persistence**: Timer state and settings saved to localStorage
-- **Dark Theme**: Modern Linear-inspired aesthetic with animated background
+- **Zen Theme**: Chinese "Bamboo Forest Breeze" aesthetic with 竹青 (Bamboo Green), 宣纸白 (Xuan Paper White), and 墨黑 (Ink Black) color palette
 - **Multiple Deployment Options**: Support for Vercel, Docker, and static hosting
 
 ---

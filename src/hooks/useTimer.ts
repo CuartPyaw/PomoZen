@@ -128,6 +128,9 @@ export function useTimer(
   // 模式切换定时器引用
   const switchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 运行状态引用（用于避免闭包陷阱）
+  const isRunningForModeRef = useRef(isRunningForMode);
+
   // onComplete 回调引用（用于避免 Worker 重新创建）
   const onCompleteRef = useRef(onComplete);
 
@@ -137,8 +140,9 @@ export function useTimer(
   useEffect(() => {
     currentModeRef.current = mode;
     pomodoroCycleRef.current = pomodoroCycle;
+    isRunningForModeRef.current = isRunningForMode;
     onCompleteRef.current = onComplete;
-  }, [mode, pomodoroCycle, onComplete]);
+  }, [mode, pomodoroCycle, isRunningForMode, onComplete]);
 
   /**
    * 监听设置变化，更新当前模式的剩余时间
@@ -154,7 +158,8 @@ export function useTimer(
       // 如果当前模式的时间设置变了，更新剩余时间
       if (prev[mode] !== newTimes[mode]) {
         // 只有在计时器未运行时才更新，避免干扰正在进行的计时
-        if (!isRunningForMode[mode]) {
+        // 使用 ref 避免将 isRunningForMode 加入依赖项
+        if (!isRunningForModeRef.current[mode]) {
           // 同时更新 localStorage 中的时间
           try {
             const key = mode === 'focus'
@@ -172,7 +177,7 @@ export function useTimer(
 
       return prev;
     });
-  }, [settings.customFocusTime, settings.customBreakTime, settings.customLongBreakTime, mode, isRunningForMode]);
+  }, [settings.customFocusTime, settings.customBreakTime, settings.customLongBreakTime, mode]);
 
   /**
    * 保存运行状态到 localStorage

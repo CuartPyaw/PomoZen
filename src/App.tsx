@@ -187,8 +187,11 @@ function App() {
 
   // ==================== 键盘快捷键 ====================
 
+  // 使用 ref 存储键盘事件处理函数，避免不必要的监听器重新创建
+  const handleKeyPressRef = useRef<(e: KeyboardEvent) => void>();
+
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
+    handleKeyPressRef.current = (e: KeyboardEvent) => {
       // 如果统计对话框打开且按了 Esc，关闭统计对话框
       if (statistics.showStatsDialog && e.key === 'Escape') {
         statistics.setShowStatsDialog(false);
@@ -219,10 +222,13 @@ function App() {
           break;
       }
     };
+  }, [settings.showSettings, settings.setShowSettings, statistics.showStatsDialog, statistics.setShowStatsDialog, timer.handleStartPause]);
 
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => handleKeyPressRef.current?.(e);
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [settings.showSettings, statistics.showStatsDialog, timer, statistics, settings]);
+  }, []);
 
   // ==================== UI 辅助函数 ====================
 

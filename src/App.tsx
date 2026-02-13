@@ -66,6 +66,7 @@ import {
 } from './components/Charts';
 import { TaskPanel } from './components/TaskPanel';
 import { ActiveTaskCard } from './components/TimerPanel';
+import { GlassCard } from './components/GlassCard';
 
 // Custom hooks
 import { useTheme } from './hooks/useTheme';
@@ -603,7 +604,7 @@ function App() {
             {/* 快捷键、专注统计、运行状态横向排布 */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {/* 键盘快捷键提示 */}
-              <Card elevation={0} sx={{ borderRadius: 4, bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+              <GlassCard glassIntensity="medium" sx={{ borderRadius: 4, flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
                 <CardContent sx={{ py: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <KeyboardIcon sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontSize: 18 }} />
@@ -616,16 +617,13 @@ function App() {
                     <Chip label="Esc 关闭设置" size="small" sx={{ bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(44,44,44,0.1)', color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontSize: '0.75rem', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)' }} />
                   </Box>
                 </CardContent>
-              </Card>
+              </GlassCard>
 
               {/* 统计信息卡片 */}
-              <Card
-                elevation={0}
+              <GlassCard
+                glassIntensity="medium"
                 sx={{
                   borderRadius: 4,
-                  bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)',
-                  backdropFilter: 'blur(10px)',
-                  border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)',
                   flex: 1,
                   minWidth: { xs: '100%', sm: '200px' },
                   cursor: 'pointer',
@@ -670,10 +668,10 @@ function App() {
                     />
                   </Box>
                 </CardContent>
-              </Card>
+              </GlassCard>
 
               {/* 运行状态面板 */}
-              <Card elevation={0} sx={{ borderRadius: 4, bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(44,44,44,0.03)', backdropFilter: 'blur(10px)', border: themeMode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(44,44,44,0.08)', flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+              <GlassCard glassIntensity="medium" sx={{ borderRadius: 4, flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
                 <CardContent sx={{ py: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#F0ECE5' : '#2C2C2C', fontWeight: 500 }}>
@@ -713,7 +711,7 @@ function App() {
                     />
                   </Box>
                 </CardContent>
-              </Card>
+              </GlassCard>
             </Box>
               </Grid>
             </Grid>
@@ -983,7 +981,7 @@ function SettingsDialog({
                     </>
                   )}
                 </CardContent>
-              </Card>
+              </GlassCard>
             </AccordionDetails>
           </Accordion>
         )}

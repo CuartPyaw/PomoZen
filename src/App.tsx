@@ -981,7 +981,7 @@ function SettingsDialog({
                     </>
                   )}
                 </CardContent>
-              </GlassCard>
+              </Card>
             </AccordionDetails>
           </Accordion>
         )}

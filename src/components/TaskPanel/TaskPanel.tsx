@@ -8,12 +8,12 @@
 import React, { useState, useCallback } from 'react';
 import {
   Box,
-  Card,
   CardContent,
   Tabs,
   Tab,
   Typography,
 } from '@mui/material';
+import { GlassCard } from '../GlassCard';
 import { TaskList } from './TaskList';
 import { TaskDialog } from './TaskDialog';
 import type { Task, TaskViewMode } from '../../types/task';
@@ -106,7 +106,8 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
   }, []);
 
   return (
-    <Card
+    <GlassCard
+      glassIntensity="medium"
       sx={{
         height: '100%',
         display: 'flex',
@@ -178,6 +179,6 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
         task={editingTask}
         mode={editingTask ? 'edit' : 'create'}
       />
-    </Card>
+    </GlassCard>
   );
 };

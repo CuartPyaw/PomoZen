@@ -20,16 +20,28 @@ interface TimeDistributionHeatmapProps {
 }
 
 /**
+ * 六种图例颜色（从浅到深）
+ */
+const legendColors = [
+  '#F7F8F2', // 米白
+  '#E9E4D4', // 浅暖灰
+  '#C7B9A9', // Crab Shell Grey
+  '#8C7B68', // 深褐灰
+  '#4A5A5E', // 青灰
+  '#2C3539', // 深墨灰
+];
+
+/**
  * 根据专注时长获取颜色
  */
 const getColorForDuration = (duration: number, maxDuration: number): string => {
-  if (duration === 0) return 'rgba(44, 44, 44, 0.03)';
+  if (duration === 0) return legendColors[0];
 
   const intensity = duration / maxDuration;
-  // 使用暖木色（褐色），颜色越深专注度越高
-  const baseColor = { r: 196, g: 167, b: 125 }; // #C4A77D
+  // 使用图例颜色数组，根据强度选择对应颜色
+  const colorIndex = Math.min(Math.floor(intensity * 6), 5);
 
-  return `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${0.2 + intensity * 0.6})`;
+  return legendColors[colorIndex];
 };
 
 /**
@@ -112,7 +124,7 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
-                  borderColor: 'rgba(196, 167, 125, 0.4)',
+                  borderColor: '#C7B9A9',
                   zIndex: 1,
                 },
               }}
@@ -134,45 +146,36 @@ export const TimeDistributionHeatmap: React.FC<TimeDistributionHeatmapProps> = (
         ))}
       </Box>
 
-      {/* 图例 */}
+      {/* 图例 - 六色方块 */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 2,
+          gap: 0.5,
           mt: 2,
         }}
       >
-        <Typography variant="caption" color="text.secondary">
-          低专注
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+          低
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: '2px',
-            width: 200,
-            height: 12,
-          }}
-        >
-          {[0, 0.2, 0.4, 0.6, 0.8, 1].map((intensity) => (
+        <Box sx={{ display: 'flex', gap: '2px' }}>
+          {legendColors.map((color) => (
             <Box
-              key={intensity}
+              key={color}
               sx={{
-                flex: 1,
-                backgroundColor: getColorForDuration(
-                  Math.round(intensity * maxDuration),
-                  maxDuration
-                ),
+                width: 24,
+                height: 12,
+                backgroundColor: color,
                 border: '1px solid',
-                borderColor: 'rgba(44, 44, 44, 0.08)',
-                borderRadius: 1,
+                borderColor: 'rgba(44, 44, 44, 0.15)',
+                borderRadius: 0.5,
               }}
             />
           ))}
         </Box>
-        <Typography variant="caption" color="text.secondary">
-          高专注
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+          高
         </Typography>
       </Box>
     </Box>

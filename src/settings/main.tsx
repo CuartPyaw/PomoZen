@@ -1,12 +1,12 @@
 /**
  * Settings 入口组件
- * 完整的设置页面，包含统计数据
+ * 设置页面，包含统计数据和设置功能，不包含计时器
  */
 import { createRoot } from 'react-dom/client';
-import App from '../App';
+import SettingsPage from '../SettingsPage';
 
 const SettingsApp = () => {
-  return <App />;
+  return <SettingsPage />;
 };
 
 const root = createRoot(document.getElementById('root')!);

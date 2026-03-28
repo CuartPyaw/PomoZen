@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./*"]
     },
 
     /* Linting */
@@ -25,5 +25,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["entrypoints", "components", "hooks", "utils", "types", "theme", "App.tsx", "SettingsPage.tsx", "wxt.config.ts"]
 }

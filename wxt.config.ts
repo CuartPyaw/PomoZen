@@ -10,7 +10,7 @@ export default defineConfig({
     action: {
       default_popup: 'popup/index.html',
     },
-    options_page: 'settings/index.html',
+    options_page: 'options/index.html',
     icons: {
       '16': 'icons/icon16.png',
       '32': 'icons/icon32.png',

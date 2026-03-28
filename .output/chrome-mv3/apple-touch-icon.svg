@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <!-- 竹青色渐变 -->
+    <linearGradient id="zen-gradient-lg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8FA398;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7A918D;stop-opacity:1" />
+    </linearGradient>
+    <!-- 宣纸白渐变 -->
+    <linearGradient id="paper-gradient-lg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F2EB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E8E4DB;stop-opacity:1" />
+    </linearGradient>
+    <!-- 柔和光晕 -->
+    <filter id="soft-glow-lg" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 - 宣纸白色圆角矩形 -->
+  <rect width="180" height="180" rx="40" fill="url(#paper-gradient-lg)" />
+
+  <!-- 外圈细边框 -->
+  <rect x="10" y="10" width="160" height="160" rx="35" fill="none" stroke="#7A918D" stroke-width="2" opacity="0.2" />
+
+  <!-- 禅意圆环 (Enso 风格) -->
+  <path d="M 50 90 A 40 40 0 1 1 130 90" stroke="url(#zen-gradient-lg)" stroke-width="8" fill="none" stroke-linecap="round" filter="url(#soft-glow-lg)" />
+
+  <!-- 时间刻度点 -->
+  <circle cx="90" cy="35" r="5" fill="#7A918D" opacity="0.8" />
+  <circle cx="125" cy="50" r="4" fill="#7A918D" opacity="0.4" />
+  <circle cx="145" cy="90" r="4" fill="#7A918D" opacity="0.4" />
+  <circle cx="125" cy="130" r="4" fill="#7A918D" opacity="0.4" />
+
+  <!-- 中心禅点 -->
+  <circle cx="90" cy="90" r="14" fill="url(#zen-gradient-lg)" filter="url(#soft-glow-lg)" />
+
+  <!-- "Zen" 汉字 "禅" 简化笔触 -->
+  <path d="M 75 110 Q 90 120 105 110" stroke="#7A918D" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6" />
+  <path d="M 90 100 L 90 125" stroke="#7A918D" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+</svg>

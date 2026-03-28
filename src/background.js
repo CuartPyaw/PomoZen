@@ -258,7 +258,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
 
       case 'GET_STATE': {
-        const state = await getTimerState();
+        let state = await getTimerState();
+        // 如果正在运行，根据 startTime 计算实际剩余时间
+        if (state.isRunning && state.startTime) {
+          const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+          state.timeLeft = Math.max(0, state.timeLeft - elapsed);
+        }
         sendResponse({ success: true, state });
         break;
       }

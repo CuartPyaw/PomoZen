@@ -186,7 +186,7 @@ function PopupApp() {
   const themeColor = MODE_COLORS[timerState.mode];
 
   return (
-    <div style={{ width: 340, padding: 16, fontFamily: '"PingFang SC", "Microsoft YaHei", system-ui, sans-serif', background: '#F0ECE5', minHeight: 400 }}>
+    <div style={{ width: 340, padding: 16, fontFamily: '"PingFang SC", "Microsoft YaHei", system-ui, sans-serif', background: '#F0ECE5', minHeight: 400, borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
       {/* 标题 */}
       <h2 style={{ textAlign: 'center', margin: '0 0 16px 0', color: '#7A918D', fontWeight: 600 }}>PomoZen</h2>
 
